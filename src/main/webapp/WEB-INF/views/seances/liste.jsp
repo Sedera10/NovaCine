@@ -386,6 +386,13 @@
                             <i class="bi bi-door-open"></i>
                             <strong>Salle:</strong> ${seance.salle.nom}
                         </div>
+                        <div class="seance-info-item">
+                            <i class="bi bi-cash-coin"></i>
+                            <strong>Potentiel:</strong> 
+                            <span class="text-success fw-bold">
+                                <fmt:formatNumber value="${totauxArgent[seance.idSeance]}" type="number" groupingUsed="true" /> Ar
+                            </span>
+                        </div>
                     </div>
                     
                     <!-- Boutons alignés à droite en bas -->

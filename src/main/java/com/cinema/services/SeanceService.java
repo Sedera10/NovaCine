@@ -1,13 +1,17 @@
 package com.cinema.services;
 
+import com.cinema.models.ConfigSalles;
 import com.cinema.models.Film;
 import com.cinema.models.Salle;
 import com.cinema.models.Seance;
+import com.cinema.models.TypePlace;
+import com.cinema.repositories.ConfigSallesRepository;
 import com.cinema.repositories.SeanceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.ObjectInputFilter.Config;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -30,6 +34,9 @@ public class SeanceService {
     
     @Autowired
     private BilletService billetService;
+
+    @Autowired
+    private ConfigSallesRepository configSallesRepository;
     
     public List<Seance> getAllSeances() {
         return seanceRepository.findAll();
@@ -80,7 +87,7 @@ public class SeanceService {
     }
     
     @Transactional
-    public Seance createSeance(Long idFilm, Long idSalle, LocalDate daty, LocalTime heure, BigDecimal prixUnitaire) throws Exception {
+    public Seance createSeance(Long idFilm, Long idSalle, LocalDate daty, LocalTime heure) throws Exception {
         Film film = filmService.getFilmById(idFilm);
         Salle salle = salleService.getSalleById(idSalle);
 
@@ -94,8 +101,8 @@ public class SeanceService {
         
         Seance seance = new Seance(daty, heure, film, salle);
         Seance savedSeance = seanceRepository.save(seance);
-        // Générer automatiquement les billets
-        billetService.genererBilletsPourSeance(savedSeance, prixUnitaire);
+        // Générer automatiquement les billets avec les prix de la configuration de la salle
+        billetService.genererBilletsPourSeance(savedSeance);
         
         return savedSeance;
     }
@@ -118,5 +125,19 @@ public class SeanceService {
     @Transactional
     public void deleteSeance(Long id) {
         seanceRepository.deleteById(id);
+    }
+
+    public double getArgentGenere(Long id) {
+        Seance seance = getSeanceById(id);
+        Salle salle = seance.getSalle();
+       
+        List<ConfigSalles> configs = configSallesRepository.findBySalle(salle);
+        double totalArgent = 0.0;
+
+        for (ConfigSalles c: configs) {
+            TypePlace tp = c.getTypePlace();
+            totalArgent += tp.getPrix() * c.getNombrePlaces();
+        }
+        return totalArgent;
     }
 }

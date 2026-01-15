@@ -104,3 +104,14 @@ FROM billets b
 JOIN places p ON b.id_place = p.id_place
 WHERE b.id_seance = 3 AND p.code_place = 'C1'
 LIMIT 1;
+
+
+
+
+INSERT INTO config_salles (id_salle, id_type_place, nombre_places) VALUES
+(1, 1, 70),  -- Salle A: 70 Standard
+(1, 2, 30),  -- Salle A: 30 Premium
+(2, 1, 50),  -- Salle B: 50 Standard
+(2, 2, 30),  -- Salle B: 30 Premium
+(3, 1, 40),  -- Salle C: 40 Standard
+(3, 2, 20);  -- Salle C: 20 Premium

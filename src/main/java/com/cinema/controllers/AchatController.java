@@ -3,9 +3,11 @@ package com.cinema.controllers;
 import com.cinema.models.Achat;
 import com.cinema.models.Billet;
 import com.cinema.models.Seance;
+import com.cinema.models.TypePlace;
 import com.cinema.services.AchatService;
 import com.cinema.services.BilletService;
 import com.cinema.services.SeanceService;
+import com.cinema.services.TypePlaceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,6 +31,9 @@ public class AchatController {
     @Autowired
     private SeanceService seanceService;
     
+    @Autowired
+    private TypePlaceService typePlaceService;
+    
     /**
      * Page d'achat de billets pour une séance
      */
@@ -37,10 +42,12 @@ public class AchatController {
         Seance seance = seanceService.getSeanceById(idSeance);
         List<Billet> billetsDisponibles = billetService.getBilletsDisponiblesBySeance(idSeance);
         List<Billet> billets = billetService.getBilletsBySeance(idSeance);
+        List<TypePlace> typesPlaces = typePlaceService.getAllTypesPlaces();
         
         model.addAttribute("seance", seance);
         model.addAttribute("billets", billets);
         model.addAttribute("billetsDisponibles", billetsDisponibles);
+        model.addAttribute("typesPlaces", typesPlaces);
         
         return "achats/achat";
     }
@@ -75,7 +82,7 @@ public class AchatController {
     }
     
     /**
-     * Liste de tous les achats
+     * Liste de tous les achats 
      */
     @GetMapping("/liste")
     public String listeAchats(Model model) {

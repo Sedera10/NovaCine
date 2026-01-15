@@ -1,9 +1,13 @@
 package com.cinema.services;
 
 import com.cinema.models.Billet;
+import com.cinema.models.ConfigSalles;
 import com.cinema.models.Place;
+import com.cinema.models.Salle;
 import com.cinema.models.Seance;
 import com.cinema.repositories.BilletRepository;
+import com.cinema.repositories.ConfigSallesRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +21,9 @@ public class BilletService {
     
     @Autowired
     private BilletRepository billetRepository;
+
+    @Autowired
+    private ConfigSallesRepository configSallesRepository;
     
     @Autowired
     private PlaceService placeService;
@@ -67,15 +74,42 @@ public class BilletService {
     }
     
     @Transactional
-    public List<Billet> genererBilletsPourSeance(Seance seance, BigDecimal prixUnitaire) {
+    public List<Billet> genererBilletsPourSeance(Seance seance) {
         List<Place> places = placeService.getPlacesBySalle(seance.getSalle().getIdSalle());
         List<Billet> billets = new ArrayList<>();
+
+        Salle salle = seance.getSalle();
+        List<ConfigSalles> configs = configSallesRepository.findBySalle(salle);
+        List<BigDecimal> prixParPlace = new ArrayList<>();
         
+        for (ConfigSalles config : configs) {
+            if (config.getTypePlace() != null) {
+                BigDecimal prix = BigDecimal.valueOf(config.getTypePlace().getPrix());
+                int nombrePlaces = config.getNombrePlaces();
+                
+                for (int i = 0; i < nombrePlaces; i++) {
+                    prixParPlace.add(prix);
+                }
+            }
+        }
+        
+        // Générer les billets avec le prix correspondant à chaque place
+        int index = 0;
         for (Place place : places) {
             if (!billetRepository.existsByPlaceIdPlaceAndSeanceIdSeance(place.getIdPlace(), seance.getIdSeance())) {
-                Billet billet = new Billet(place, seance, prixUnitaire);
+                // Récupérer le prix selon l'index de la place, ou prix par défaut si pas de config
+                BigDecimal prixBillet = BigDecimal.ZERO;
+                if (index < prixParPlace.size()) {
+                    prixBillet = prixParPlace.get(index);
+                } else if (!prixParPlace.isEmpty()) {
+                    // Si plus d'index disponible, utiliser le dernier prix
+                    prixBillet = prixParPlace.get(prixParPlace.size() - 1);
+                }
+                
+                Billet billet = new Billet(place, seance, prixBillet);
                 billets.add(billetRepository.save(billet));
             }
+            index++;
         }
         
         return billets;

@@ -92,3 +92,25 @@ CREATE TABLE achat_billets (
    FOREIGN KEY (id_billet) REFERENCES billets(id_billet) 
        ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+-- projet 15 janvier
+
+CREATE TABLE type_places (
+   id_type_place SERIAL PRIMARY KEY,
+   nom VARCHAR(50) NOT NULL,
+   prix NUMERIC(15,2) NOT NULL
+);
+
+CREATE TABLE config_salles (
+   id_config_salle SERIAL PRIMARY KEY,
+   id_salle INTEGER NOT NULL,
+   id_type_place INTEGER NOT NULL,
+   nombre_places INTEGER NOT NULL,
+
+   FOREIGN KEY (id_salle) REFERENCES salles(id_salle),
+   FOREIGN KEY (id_type_place) REFERENCES type_places(id_type_place),
+
+   UNIQUE (id_salle, id_type_place)
+);
+
+

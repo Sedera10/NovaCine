@@ -66,6 +66,32 @@
             background-color: var(--primary-color);
             color: white;
         }
+        /* Style pour places Standard */
+        .place.standard {
+            border-color: #28a745;
+        }
+        .place.standard.disponible {
+            background-color: #d4edda;
+            color: #155724;
+            border-color: #28a745;
+        }
+        .place.standard.disponible:hover {
+            background-color: #28a745;
+            color: white;
+        }
+        /* Style pour places Premium */
+        .place.premium {
+            border-color: #ffc107;
+        }
+        .place.premium.disponible {
+            background-color: #fff3cd;
+            color: #856404;
+            border-color: #ffc107;
+        }
+        .place.premium.disponible:hover {
+            background-color: #ffc107;
+            color: #212529;
+        }
         .place.occupee {
             background-color: #dee2e6;
             color: #6c757d;
@@ -113,16 +139,19 @@
     </style>
     <script>
         let placesSelectionnees = [];
+        let prixPlaces = {}; // Stocker le prix de chaque place sélectionnée
         
-        function togglePlace(idBillet, codePlace) {
+        function togglePlace(idBillet, codePlace, prix) {
             const index = placesSelectionnees.indexOf(idBillet);
             const placeElement = document.getElementById('place-' + idBillet);
             
             if (index > -1) {
                 placesSelectionnees.splice(index, 1);
+                delete prixPlaces[idBillet];
                 placeElement.classList.remove('selectionnee');
             } else {
                 placesSelectionnees.push(idBillet);
+                prixPlaces[idBillet] = prix;
                 placeElement.classList.add('selectionnee');
             }
             
@@ -133,10 +162,12 @@
             document.getElementById('places-count').textContent = placesSelectionnees.length;
             document.getElementById('ids-billets').value = placesSelectionnees.join(',');
             
-            // Calculer le total (prix * nombre de places)
-            const prixUnitaire = parseFloat(document.getElementById('prix-unitaire').value);
-            const total = placesSelectionnees.length * prixUnitaire;
-            document.getElementById('total-amount').textContent = total.toFixed(2);
+            // Calculer le total en additionnant les prix de chaque place sélectionnée
+            let total = 0;
+            for (let idBillet in prixPlaces) {
+                total += parseFloat(prixPlaces[idBillet]);
+            }
+            document.getElementById('total-amount').textContent = total.toLocaleString('fr-FR');
         }
         
         function validerAchat() {
@@ -180,9 +211,19 @@
         
         <!-- Légende -->
         <div class="legende">
-            <div class="legende-item">
-                <span class="legende-box disponible"></span> Disponible
-            </div>
+            <c:forEach var="typePlace" items="${typesPlaces}">
+                <div class="legende-item">
+                    <c:choose>
+                        <c:when test="${typePlace.nom == 'Premium'}">
+                            <span class="legende-box" style="background-color: #fff3cd; border-color: #ffc107;"></span>
+                        </c:when>
+                        <c:otherwise>
+                            <span class="legende-box" style="background-color: #d4edda; border-color: #28a745;"></span>
+                        </c:otherwise>
+                    </c:choose>
+                    ${typePlace.nom} (<fmt:formatNumber value="${typePlace.prix}" type="number" groupingUsed="true"/> Ar)
+                </div>
+            </c:forEach>
             <div class="legende-item">
                 <span class="legende-box occupee"></span> Occupée
             </div>
@@ -208,9 +249,23 @@
                 </c:if>
                 
                 <c:set var="estDisponible" value="${billetsDisponibles.contains(billet)}"/>
+                <%-- Déterminer le type de place selon le prix - Premium a un prix plus élevé --%>
+                <c:set var="typeClass" value="standard"/>
+                <c:set var="prixBillet" value="${billet.prix}"/>
+                <c:forEach var="tp" items="${typesPlaces}">
+                    <c:if test="${tp.nom eq 'Premium'}">
+                        <c:set var="prixPremium" value="${tp.prix}"/>
+                    </c:if>
+                </c:forEach>
+                <%-- Si le prix du billet >= prix Premium, c'est une place Premium --%>
+                <c:if test="${not empty prixPremium && prixBillet >= prixPremium}">
+                    <c:set var="typeClass" value="premium"/>
+                </c:if>
+                
                 <div id="place-${billet.idBillet}" 
-                     class="place ${estDisponible ? 'disponible' : 'occupee'}"
-                     onclick="${estDisponible ? 'togglePlace(' += billet.idBillet += ', \'' += billet.place.codePlace += '\')' : ''}">
+                     class="place ${typeClass} ${estDisponible ? 'disponible' : 'occupee'}"
+                     data-prix="${billet.prix}"
+                     onclick="${estDisponible ? 'togglePlace(' += billet.idBillet += ', \'' += billet.place.codePlace += '\', ' += billet.prix += ')' : ''}">
                     ${billet.place.codePlace}
                 </div>
             </c:forEach>
@@ -221,22 +276,30 @@
         <div class="selection-info">
             <form method="post" action="<c:url value='/achats/confirmer'/>" onsubmit="return validerAchat()">
                 <input type="hidden" id="ids-billets" name="idsBillets" value="">
-                <input type="hidden" id="prix-unitaire" value="${billets[0].prix}">
                 
-                <div class="form-group">
-                    <label for="nom-acheteur">Nom de l'acheteur:</label>
+                <div class="form-group mb-3">
+                    <label for="nom-acheteur" class="form-label"><strong>Nom de l'acheteur:</strong></label>
                     <input type="text" id="nom-acheteur" name="nomAcheteur" 
                            class="form-control" required>
                 </div>
                 
-                <div class="form-group">
+                <div class="form-group mb-3">
+                    <h5>Récapitulatif</h5>
                     <p><strong>Places sélectionnées:</strong> <span id="places-count">0</span></p>
-                    <p><strong>Prix unitaire:</strong> ${billets[0].prix} Ar</p>
-                    <p><strong>Total:</strong> <span id="total-amount">0</span> Ar</p>
+                    <c:forEach var="typePlace" items="${typesPlaces}">
+                        <p class="mb-1">
+                            <span class="badge" style="background-color: ${typePlace.nom == 'Premium' ? '#ffc107' : '#28a745'}; color: ${typePlace.nom == 'Premium' ? '#212529' : 'white'}">
+                                ${typePlace.nom}
+                            </span>
+                            <fmt:formatNumber value="${typePlace.prix}" type="number" groupingUsed="true"/> Ar / place
+                        </p>
+                    </c:forEach>
+                    <hr>
+                    <p><strong style="font-size: 1.2rem;">Total: <span id="total-amount" class="text-success">0</span> Ar</strong></p>
                 </div>
                 
-                <button type="submit" class="btn btn-success">Confirmer l'achat</button>
-                <a href="<c:url value='/seances'/>" class="btn">Annuler</a>
+                <button type="submit" class="btn btn-success"><i class="bi bi-check-circle"></i> Confirmer l'achat</button>
+                <a href="<c:url value='/seances'/>" class="btn btn-outline-secondary"><i class="bi bi-x-circle"></i> Annuler</a>
             </form>
         </div>
         </div>

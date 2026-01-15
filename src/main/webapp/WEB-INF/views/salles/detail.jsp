@@ -1,8 +1,11 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.time.format.DateTimeFormatter" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
-<% DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"); %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<% 
+    DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+    pageContext.setAttribute("dateFormatter", dateFormatter);
+%>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -45,7 +48,7 @@
         }
 
         .info-card {
-            background: var(--white);
+            background: white;
             border: 1px solid var(--primary-color);
             border-radius: 4px;
             padding: 1.2rem;
@@ -81,48 +84,6 @@
             color: var(--primary-color);
         }
 
-        .badge-statut {
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-weight: bold;
-        }
-
-        .badge-active {
-            background-color: #28a745;
-            color: white;
-        }
-
-        .badge-maintenance {
-            background-color: #ffc107;
-            color: var(--primary-color);
-        }
-
-        .badge-fermee {
-            background-color: #dc3545;
-            color: white;
-        }
-
-        .stat-box {
-            background: linear-gradient(135deg, var(--primary-color), #162d52);
-            color: white;
-            padding: 1.2rem;
-            border-radius: 4px;
-            text-align: center;
-            margin-bottom: 1.2rem;
-        }
-
-        .stat-value {
-            font-size: 2rem;
-            font-weight: bold;
-            color: white;
-        }
-
-        .stat-label {
-            font-size: 0.9rem;
-            color: white;
-            margin-top: 0.5rem;
-        }
-
         .btn-primary {
             background-color: var(--primary-color);
             border: none;
@@ -148,114 +109,63 @@
             background-color: #e0a800;
         }
 
-        .plan-container {
-            background: var(--white);
-            border: 1px solid var(--primary-color);
-            border-radius: 4px;
+        .config-card {
+            background: white;
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
             padding: 1.5rem;
-            margin-bottom: 1.2rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-        }
-
-        .ecran {
-            background: linear-gradient(to bottom, var(--primary-color), #162d52);
-            color: white;
-            padding: 0.8rem;
             text-align: center;
-            border-radius: 8px 8px 50% 50%;
-            margin-bottom: 1.5rem;
+            transition: transform 0.2s;
+        }
+
+        .config-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .config-card.standard {
+            border-left: 5px solid #28a745;
+        }
+
+        .config-card.premium {
+            border-left: 5px solid #ffc107;
+        }
+
+        .config-nombre {
+            font-size: 2.5rem;
             font-weight: bold;
-            font-size: 1rem;
-        }
-
-        .sieges-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            align-items: center;
-        }
-
-        .rangee-container {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .rangee-label {
             color: var(--primary-color);
-            font-weight: bold;
+        }
+
+        .config-type {
             font-size: 1.1rem;
-            width: 30px;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-top: 0.5rem;
+        }
+
+        .config-prix {
+            font-size: 0.95rem;
+            color: #666;
+            margin-top: 0.3rem;
+        }
+
+        .gain-potentiel {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
             text-align: center;
         }
 
-        .sieges-row {
-            display: flex;
-            gap: 0.3rem;
-        }
-
-        .siege {
-            width: 32px;
-            height: 32px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.65rem;
+        .gain-potentiel .montant {
+            font-size: 1.8rem;
             font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: 2px solid transparent;
         }
 
-        .siege:hover {
-            transform: scale(1.08);
-            border-color: var(--primary-color);
-        }
-
-        .siege-disponible {
-            background-color: #28a745;
-            color: white;
-        }
-
-        .siege-hors-service {
-            background-color: #dc3545;
-            color: white;
-        }
-
-        .siege-vip {
-            background-color: #9c27b0;
-            color: white;
-        }
-
-        .siege-handicape {
-            background-color: #17a2b8;
-            color: white;
-        }
-
-        .legende {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin-top: 2rem;
-            flex-wrap: wrap;
-        }
-
-        .legende-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .legende-box {
-            width: 30px;
-            height: 30px;
-            border-radius: 5px;
-        }
-
-        .legende-label {
-            color: var(--primary-color);
-            font-weight: bold;
+        .gain-potentiel .label {
+            font-size: 0.9rem;
+            opacity: 0.9;
         }
     </style>
 </head>
@@ -263,7 +173,7 @@
     <%@ include file="../includes/sidebar.jsp" %>
 
     <div class="main-content">
-        <div class="container-fluid">
+        <div class="container-fluid p-4">
             <!-- Header -->
             <div class="page-header">
                 <div class="d-flex justify-content-between align-items-center flex-wrap">
@@ -271,27 +181,10 @@
                         <h1 class="salle-title">
                             <i class="bi bi-door-open"></i> ${salle.nom}
                         </h1>
-                        <c:choose>
-                            <c:when test="${salle.statut == 'ACTIVE'}">
-                                <span class="badge-statut badge-active mt-2">Active</span>
-                            </c:when>
-                            <c:when test="${salle.statut == 'MAINTENANCE'}">
-                                <span class="badge-statut badge-maintenance mt-2">Maintenance</span>
-                            </c:when>
-                            <c:otherwise>
-                                <span class="badge-statut badge-fermee mt-2">Fermée</span>
-                            </c:otherwise>
-                        </c:choose>
                     </div>
                     <div class="d-flex gap-2 mt-3 mt-md-0">
                         <a href="${pageContext.request.contextPath}/salles" class="btn btn-secondary">
                             <i class="bi bi-arrow-left"></i> Retour
-                        </a>
-                        <a href="${pageContext.request.contextPath}/salles/${salle.idSalle}/modifier" class="btn btn-primary">
-                            <i class="bi bi-pencil"></i> Modifier
-                        </a>
-                        <a href="${pageContext.request.contextPath}/salles/${salle.idSalle}/plan" class="btn btn-primary">
-                            <i class="bi bi-grid"></i> Plan Interactif
                         </a>
                     </div>
                 </div>
@@ -303,20 +196,12 @@
                     <div class="info-card">
                         <h5><i class="bi bi-info-circle"></i> Informations Générales</h5>
                         <div class="info-item">
-                            <span class="info-label">Type:</span>
-                            <span class="info-value">${salle.typeSalle.nom}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Prix de base:</span>
-                            <span class="info-value">${salle.typeSalle.prixBase} Ar</span>
-                        </div>
-                        <div class="info-item">
                             <span class="info-label">Capacité totale:</span>
-                            <span class="info-value">${salle.capaciteTotale} places</span>
+                            <span class="info-value">${salle.capacite} places</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Configuration:</span>
-                            <span class="info-value">${salle.nbRangees} × ${salle.nbColonnes}</span>
+                            <span class="info-value">${salle.nbRangee} rangées × ${salle.nbColonne} colonnes</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Date de création:</span>
@@ -326,113 +211,80 @@
                         </div>
                     </div>
 
-                    <!-- Statistiques -->
-                    <div class="info-card">
-                        <h5><i class="bi bi-bar-chart"></i> Statistiques des Sièges</h5>
-                        <div class="stat-box">
-                            <div class="stat-value">${stats.nbDisponibles}</div>
-                            <div class="stat-label">Sièges Disponibles</div>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Standard:</span>
-                            <span class="info-value">${stats.nbStandard}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">VIP:</span>
-                            <span class="info-value">${stats.nbVip}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Handicapé:</span>
-                            <span class="info-value">${stats.nbHandicape}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Hors Service:</span>
-                            <span class="info-value">${stats.nbHorsService}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Taux de disponibilité:</span>
-                            <span class="info-value">${String.format("%.1f", stats.tauxDisponibilite)}%</span>
+                    <!-- Gain potentiel -->
+                    <div class="gain-potentiel">
+                        <div class="label"><i class="bi bi-cash-stack"></i> Gain potentiel par séance</div>
+                        <div class="montant">
+                            <fmt:formatNumber value="${gainPotentiel}" pattern="#,##0"/> Ar
                         </div>
                     </div>
                 </div>
 
-                <!-- Plan de la salle -->
+                <!-- Configuration des places -->
                 <div class="col-lg-8">
-                    <div class="plan-container">
-                        <h5 style="color: var(--primary-color); font-weight: bold; margin-bottom: 1.5rem;">
-                            <i class="bi bi-grid-3x3"></i> Plan de la Salle
-                        </h5>
+                    <div class="info-card">
+                        <h5><i class="bi bi-grid-3x3-gap"></i> Configuration des Places</h5>
                         
-                        <!-- Écran -->
-                        <div class="ecran">
-                            <i class="bi bi-tv"></i> ÉCRAN
-                        </div>
+                        <c:choose>
+                            <c:when test="${not empty configurations}">
+                                <div class="row g-3">
+                                    <c:forEach items="${configurations}" var="config">
+                                        <div class="col-md-6">
+                                            <c:set var="typeClass" value="${config.typePlace.nom.toLowerCase().contains('premium') ? 'premium' : 'standard'}" />
+                                            <div class="config-card ${typeClass}">
+                                                <div class="config-nombre">${config.nombrePlaces}</div>
+                                                <div class="config-type">
+                                                    <c:choose>
+                                                        <c:when test="${typeClass == 'premium'}">
+                                                            <i class="bi bi-star-fill text-warning"></i>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <i class="bi bi-check-circle-fill text-success"></i>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                    ${config.typePlace.nom}
+                                                </div>
+                                                <div class="config-prix">
+                                                    <fmt:formatNumber value="${config.typePlace.prix}" pattern="#,##0"/> Ar / place
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </c:forEach>
+                                </div>
+                            </c:when>
+                            <c:otherwise>
+                                <div class="alert alert-info">
+                                    <i class="bi bi-info-circle"></i> 
+                                    Aucune configuration de places définie pour cette salle.
+                                </div>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
 
-                        <!-- Grille des sièges -->
-                        <div class="sieges-grid">
-                            <c:set var="currentRangee" value="" />
-                            <c:forEach items="${sieges}" var="siege" varStatus="status">
-                                <c:choose>
-                                    <c:when test="${siege.rangee != currentRangee}">
-                                        <c:if test="${!status.first}">
-                                            </div></div> <!-- Fermer rangee précédente -->
-                                        </c:if>
-                                        <div class="rangee-container">
-                                            <div class="rangee-label">${siege.rangee}</div>
-                                            <div class="sieges-row">
-                                        <c:set var="currentRangee" value="${siege.rangee}" />
-                                    </c:when>
-                                </c:choose>
-                                
-                                <c:choose>
-                                    <c:when test="${siege.statut == 'HORS_SERVICE'}">
-                                        <div class="siege siege-hors-service" title="${siege.position} - Hors Service">
-                                            <i class="bi bi-x"></i>
+                    <!-- Résumé visuel -->
+                    <c:if test="${not empty configurations}">
+                        <div class="info-card">
+                            <h5><i class="bi bi-bar-chart"></i> Répartition des Places</h5>
+                            <c:forEach items="${configurations}" var="config">
+                                <c:set var="pourcentage" value="${(config.nombrePlaces * 100) / salle.capacite}" />
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span class="info-label">${config.typePlace.nom}</span>
+                                        <span>${config.nombrePlaces} places (${String.format("%.0f", pourcentage)}%)</span>
+                                    </div>
+                                    <div class="progress" style="height: 20px;">
+                                        <c:set var="barColor" value="${config.typePlace.nom.toLowerCase().contains('premium') ? 'bg-warning' : 'bg-success'}" />
+                                        <div class="progress-bar ${barColor}" role="progressbar" 
+                                             style="width: ${pourcentage}%;" 
+                                             aria-valuenow="${pourcentage}" 
+                                             aria-valuemin="0" 
+                                             aria-valuemax="100">
                                         </div>
-                                    </c:when>
-                                    <c:when test="${siege.typeSiege.nom == 'VIP'}">
-                                        <div class="siege siege-vip" title="${siege.position} - VIP">
-                                            <i class="bi bi-star-fill"></i>
-                                        </div>
-                                    </c:when>
-                                    <c:when test="${siege.typeSiege.nom == 'HANDICAPE'}">
-                                        <div class="siege siege-handicape" title="${siege.position} - Handicapé">
-                                            <i class="bi bi-universal-access"></i>
-                                        </div>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <div class="siege siege-disponible" title="${siege.position} - Disponible">
-                                            ${siege.numero}
-                                        </div>
-                                    </c:otherwise>
-                                </c:choose>
-                                
-                                <c:if test="${status.last}">
-                                    </div></div> <!-- Fermer dernière rangée -->
-                                </c:if>
+                                    </div>
+                                </div>
                             </c:forEach>
                         </div>
-
-                        <!-- Légende -->
-                        <div class="legende">
-                            <div class="legende-item">
-                                <div class="legende-box siege-disponible"></div>
-                                <span class="legende-label">Standard</span>
-                            </div>
-                            <div class="legende-item">
-                                <div class="legende-box siege-vip"></div>
-                                <span class="legende-label">VIP</span>
-                            </div>
-                            <div class="legende-item">
-                                <div class="legende-box siege-handicape"></div>
-                                <span class="legende-label">Handicapé</span>
-                            </div>
-                            <div class="legende-item">
-                                <div class="legende-box siege-hors-service"></div>
-                                <span class="legende-label">Hors Service</span>
-                            </div>
-                        </div>
-                    </div>
+                    </c:if>
                 </div>
             </div>
         </div>

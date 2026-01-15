@@ -13,13 +13,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/seances")
@@ -57,11 +55,19 @@ public class SeanceController {
             seances = seanceService.getSeancesAVenir();
         }
         
+        // Calculer le total d'argent pour chaque séance
+        Map<Long, Double> totauxArgent = new HashMap<>();
+        for (Seance seance : seances) {
+            Double totalArgent = seanceService.getArgentGenere(seance.getIdSeance());
+            totauxArgent.put(seance.getIdSeance(), totalArgent);
+        }
+        
         // Pour les filtres
         List<Film> films = filmService.getAllFilms();
         List<Salle> salles = salleService.getAllSalles();
         
         model.addAttribute("seances", seances);
+        model.addAttribute("totauxArgent", totauxArgent);
         model.addAttribute("films", films);
         model.addAttribute("salles", salles);
         model.addAttribute("idFilm", idFilm);
@@ -78,9 +84,13 @@ public class SeanceController {
     public String detailSeance(@PathVariable Long id, Model model) {
         Seance seance = seanceService.getSeanceById(id);
         Map<String, Object> stats = seanceService.getStatistiquesSeance(id);
+
+        Double totalargent = seanceService.getArgentGenere(id);
         
         model.addAttribute("seance", seance);
         model.addAttribute("stats", stats);
+
+        model.addAttribute("totalargent", totalargent);
         
         return "seances/detail";
     }
@@ -111,11 +121,10 @@ public class SeanceController {
             @RequestParam Long idSalle,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dtSeance,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime heureDebut,
-            @RequestParam BigDecimal prixBase,
             RedirectAttributes redirectAttributes) {
         
         try {
-            Seance seance = seanceService.createSeance(idFilm, idSalle, dtSeance, heureDebut, prixBase);
+            Seance seance = seanceService.createSeance(idFilm, idSalle, dtSeance, heureDebut);
             redirectAttributes.addFlashAttribute("success", "Séance créée avec succès");
             return "redirect:/seances";
         } catch (Exception e) {

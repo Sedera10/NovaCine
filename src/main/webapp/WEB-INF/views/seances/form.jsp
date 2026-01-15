@@ -237,24 +237,6 @@
                         </div>
                     </div>
                     
-                    <!-- Section Prix -->
-                    <div class="form-section">
-                        <h5><i class="bi bi-tag me-2"></i>Tarification</h5>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="prixBase" class="form-label">
-                                        Prix de base (Ar) <span class="required-star">*</span>
-                                    </label>
-                                    <input type="number" class="form-control" id="prixBase" name="prixBase" 
-                                           value="${seanceDTO.prixBase}" step="100" min="0" required>
-                                    <small class="text-muted">Prix par place en Ariary</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
                     <!-- Boutons d'action -->
                     <div class="d-flex gap-2 justify-content-end">
                         <a href="${pageContext.request.contextPath}/seances" class="btn btn-outline-secondary">

@@ -202,12 +202,14 @@
                                 <div class="info-label"><i class="bi bi-shield-check"></i>Classification</div>
                                 <div class="info-value">${seance.film.classification.nom}</div>
                             </div> --%>
-                            <c:if test="${not empty seance.film.realisateur}">
-                                <div class="info-row">
-                                    <div class="info-label"><i class="bi bi-person-video2"></i>Réalisateur</div>
-                                    <div class="info-value">${seance.film.realisateur}</div>
+                            <div class="info-row">
+                                <div class="info-label"><i class="bi bi-cash-coin"></i>Argent générable</div>
+                                <div class="info-value">
+                                    <strong class="text-success">
+                                        <fmt:formatNumber value="${totalargent}" type="number" groupingUsed="true" /> Ar
+                                    </strong>
                                 </div>
-                            </c:if>
+                            </div>
                         </div>
                         
                         <!-- Informations Séance -->
@@ -216,29 +218,20 @@
                             <div class="info-row">
                                 <div class="info-label"><i class="bi bi-calendar3"></i>Date</div>
                                 <div class="info-value">
-                                    <fmt:formatDate value="${seance.dtSeance}" pattern="EEEE d MMMM yyyy" />
+                                    ${seance.daty}
                                 </div>
                             </div>
                             <div class="info-row">
                                 <div class="info-label"><i class="bi bi-clock"></i>Horaires</div>
                                 <div class="info-value">
-                                    <fmt:formatDate value="${seance.heureDebut}" pattern="HH:mm" /> - 
-                                    <fmt:formatDate value="${seance.heureFin}" pattern="HH:mm" />
+                                    ${seance.heure}
                                 </div>
                             </div>
                             <div class="info-row">
                                 <div class="info-label"><i class="bi bi-door-open"></i>Salle</div>
                                 <div class="info-value">
                                     ${seance.salle.nom} 
-                                    <small class="text-muted">(${seance.salle.capaciteTotale} places)</small>
-                                </div>
-                            </div>
-                            <div class="info-row">
-                                <div class="info-label"><i class="bi bi-tag"></i>Prix</div>
-                                <div class="info-value">
-                                    <strong class="text-primary" style="font-size: 1.3rem;">
-                                        <fmt:formatNumber value="${seance.prixBase}" type="currency" currencySymbol="Ar" />
-                                    </strong>
+                                    <small class="text-muted">(${seance.salle.capacite} places)</small>
                                 </div>
                             </div>
                             <div class="info-row">
@@ -296,10 +289,6 @@
                                     </div>
                                 </c:otherwise>
                             </c:choose>
-                        </div>
-                        
-                        <div class="text-center text-muted">
-                            <strong>${seance.placesVendues}</strong> / ${seance.placesTotales} places vendues
                         </div>
                     </div>
                     
