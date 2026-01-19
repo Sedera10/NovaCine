@@ -1,13 +1,7 @@
 package com.cinema.controllers;
 
-import com.cinema.models.Achat;
-import com.cinema.models.Billet;
-import com.cinema.models.Seance;
-import com.cinema.models.TypePlace;
-import com.cinema.services.AchatService;
-import com.cinema.services.BilletService;
-import com.cinema.services.SeanceService;
-import com.cinema.services.TypePlaceService;
+import com.cinema.models.*;
+import com.cinema.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,22 +29,83 @@ public class AchatController {
     @Autowired
     private TypePlaceService typePlaceService;
     
+    @Autowired
+    private PlaceService placeService;
+    
+    @Autowired
+    private ConfigSeanceService configSeanceService;
+    
+    @Autowired
+    private ConfigRemisePersonneService configRemisePersonneService;
+
+    @Autowired
+    private com.cinema.repositories.ConfigSeanceRepository configSeanceRepository;
+
+    @Autowired
+    private com.cinema.repositories.TypePersonneRepository typePersonneRepository;
+    
     /**
      * Page d'achat de billets pour une séance
      */
     @GetMapping("/seance/{idSeance}")
     public String pageAchat(@PathVariable Long idSeance, Model model) {
         Seance seance = seanceService.getSeanceById(idSeance);
-        List<Billet> billetsDisponibles = billetService.getBilletsDisponiblesBySeance(idSeance);
-        List<Billet> billets = billetService.getBilletsBySeance(idSeance);
+        List<Place> places = placeService.getPlacesBySalle(seance.getSalle().getIdSalle());
         List<TypePlace> typesPlaces = typePlaceService.getAllTypesPlaces();
+        List<TypePersonne> typePersonnes = typePersonneRepository.findAll();
+        List<ConfigRemisePersonne> remises = configRemisePersonneService.getAllRemises();
+        
+        // Récupérer les prix depuis ConfigSeance pour cette séance
+        Map<Long, BigDecimal> prixParTypePlace = new HashMap<>();
+        List<ConfigSeance> configSeances = configSeanceService.getConfigsBySeance(idSeance);
+        for (ConfigSeance cs : configSeances) {
+            prixParTypePlace.put(cs.getTypePlace().getId_type_place(), cs.getPrix());
+        }
+        
+        // Créer une map des remises par type de personne
+        Map<Long, BigDecimal> remiseParTypePersonne = new HashMap<>();
+        for (ConfigRemisePersonne r : remises) {
+            remiseParTypePersonne.put(r.getTypePersonne().getIdTypePersonne(), r.getRemise());
+        }
+        
+        // Récupérer les places déjà achetées
+        List<Billet> billetsVendus = billetService.getBilletsBySeance(idSeance);
+        Map<Long, Boolean> placesOccupees = new HashMap<>();
+        for (Billet b : billetsVendus) {
+            if (!b.getAchats().isEmpty()) {
+                placesOccupees.put(b.getPlace().getIdPlace(), true);
+            }
+        }
         
         model.addAttribute("seance", seance);
-        model.addAttribute("billets", billets);
-        model.addAttribute("billetsDisponibles", billetsDisponibles);
+        model.addAttribute("places", places);
         model.addAttribute("typesPlaces", typesPlaces);
+        model.addAttribute("typePersonnes", typePersonnes);
+        model.addAttribute("prixParTypePlace", prixParTypePlace);
+        model.addAttribute("remiseParTypePersonne", remiseParTypePersonne);
+        model.addAttribute("placesOccupees", placesOccupees);
         
         return "achats/achat";
+    }
+
+    @GetMapping("/prix-place")
+    @ResponseBody
+    public String getPrixForPlaceAndTypePersonne(@RequestParam Long idSeance, 
+                                                  @RequestParam Long idTypePlace,
+                                                  @RequestParam(required = false) Long idTypePersonne) {
+        try {
+            ConfigSeance cfgSeance = configSeanceRepository.findBySeanceIdSeanceAndTypePlaceId(idSeance, idTypePlace);
+            if (cfgSeance == null) return "0";
+            
+            BigDecimal prixBase = cfgSeance.getPrix();
+            if (prixBase == null) return "0";
+            
+            // Appliquer la remise si type de personne spécifié
+            BigDecimal prixFinal = configRemisePersonneService.calculerPrixAvecRemise(prixBase, idTypePersonne);
+            return prixFinal.toString();
+        } catch (Exception e) {
+            return "0";
+        }
     }
     
     /**
@@ -57,17 +113,20 @@ public class AchatController {
      */
     @PostMapping("/confirmer")
     public String confirmerAchat(@RequestParam String nomAcheteur,
-                                  @RequestParam List<Long> idsBillets,
+                                  @RequestParam Long idSeance,
+                                  @RequestParam List<Long> idsPlaces,
+                                  @RequestParam(required = false) List<Long> typePersonneIds,
                                   RedirectAttributes redirectAttributes) {
         try {
-            Achat achat = achatService.createAchat(nomAcheteur, idsBillets);
+            Achat achat = achatService.createAchatFromPlaces(nomAcheteur, idSeance, idsPlaces, typePersonneIds,
+                    configSeanceRepository, configRemisePersonneService, placeService);
             redirectAttributes.addFlashAttribute("success", 
                 "Achat confirmé ! Total: " + achat.getTotal() + " Ar");
             redirectAttributes.addFlashAttribute("achatId", achat.getIdAchat());
             return "redirect:/achats/confirmation/" + achat.getIdAchat();
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/achats/seance/" + idsBillets.get(0);
+            return "redirect:/achats/seance/" + idSeance;
         }
     }
     

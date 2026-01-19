@@ -12,23 +12,19 @@ public class TypePlace {
 
     @Column(name = "nom")
     private String nom;
-
-    @Column(name = "prix")
-    private float prix;
+    
 
     // Constructeurs
     public TypePlace() {
     }
 
-    public TypePlace(long id_type_place, String nom, float prix) {
+    public TypePlace(long id_type_place, String nom) {
         this.id_type_place = id_type_place;
         this.nom = nom;
-        this.prix = prix;
     }
 
-    public TypePlace(String nom, float prix) {
+    public TypePlace(String nom) {
         this.nom = nom;
-        this.prix = prix;
     }
 
     // Getters et Setters
@@ -40,6 +36,15 @@ public class TypePlace {
         this.id_type_place = id_type_place;
     }
 
+    // Standard id accessor for Spring Data property paths
+    public Long getId() {
+        return this.id_type_place;
+    }
+
+    public void setId(Long id) {
+        this.id_type_place = id;
+    }
+
     public String getNom() {
         return nom;
     }
@@ -48,11 +53,4 @@ public class TypePlace {
         this.nom = nom;
     }
 
-    public float getPrix() {
-        return prix;
-    }
-
-    public void setPrix(float prix) {
-        this.prix = prix;
-    }
 }

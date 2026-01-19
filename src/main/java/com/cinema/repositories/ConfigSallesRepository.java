@@ -13,6 +13,7 @@ import java.util.List;
 @Repository
 public interface ConfigSallesRepository extends JpaRepository<ConfigSalles, Long>{
     List<ConfigSalles> findBySalle(Salle salle);
+    List<ConfigSalles> findBySalleIdSalle(Long idSalle);
     
     @Query("SELECT SUM(c.nombrePlaces) FROM ConfigSalles c WHERE c.salle.idSalle = :idSalle")
     Integer sumNombrePlacesByIdSalle(@Param("idSalle") Long idSalle);

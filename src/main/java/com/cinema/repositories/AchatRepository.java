@@ -20,7 +20,7 @@ public interface AchatRepository extends JpaRepository<Achat, Long> {
     @Query("SELECT a FROM Achat a JOIN a.billets b WHERE b.seance.idSeance = :idSeance")
     List<Achat> findAchatsBySeance(@Param("idSeance") Long idSeance);
     
-    @Query("SELECT SUM(a.total) FROM Achat a JOIN a.billets b WHERE b.seance.idSeance = :idSeance")
+    @Query("SELECT SUM(DISTINCT a.total) FROM Achat a JOIN a.billets b WHERE b.seance.idSeance = :idSeance")
     BigDecimal sumTotalBySeance(@Param("idSeance") Long idSeance);
     
     @Query("SELECT SUM(a.total) FROM Achat a WHERE a.dtAchat BETWEEN :debut AND :fin")

@@ -174,11 +174,10 @@
                         <h1 class="mb-2"><i class="bi bi-film me-2"></i>Gestion des Films</h1>
                         <p class="mb-0 opacity-75">Catalogue complet des films</p>
                     </div>
-                    <c:if test="${user.role.nomRole eq 'Admin' or user.role.nomRole eq 'Manager'}">
                         <a href="${pageContext.request.contextPath}/films/nouveau" class="btn btn-secondary-custom btn-lg">
                             <i class="bi bi-plus-circle me-2"></i>Nouveau Film
                         </a>
-                    </c:if>
+              
                 </div>
             </div>
             

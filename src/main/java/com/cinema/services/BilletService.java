@@ -3,6 +3,7 @@ package com.cinema.services;
 import com.cinema.models.Billet;
 import com.cinema.models.ConfigSalles;
 import com.cinema.models.Place;
+import com.cinema.models.ConfigSeance;
 import com.cinema.models.Salle;
 import com.cinema.models.Seance;
 import com.cinema.repositories.BilletRepository;
@@ -24,6 +25,9 @@ public class BilletService {
 
     @Autowired
     private ConfigSallesRepository configSallesRepository;
+    
+    @Autowired
+    private com.cinema.repositories.ConfigSeanceRepository configSeanceRepository;
     
     @Autowired
     private PlaceService placeService;
@@ -84,9 +88,14 @@ public class BilletService {
         
         for (ConfigSalles config : configs) {
             if (config.getTypePlace() != null) {
-                BigDecimal prix = BigDecimal.valueOf(config.getTypePlace().getPrix());
+                // Try to find a ConfigSeance for this seance and typePlace to get the base price
+                ConfigSeance cfg = configSeanceRepository.findBySeanceIdSeanceAndTypePlaceId(seance.getIdSeance(), config.getTypePlace().getId());
+                BigDecimal prix = BigDecimal.ZERO;
+                if (cfg != null && cfg.getPrix() != null) {
+                    prix = cfg.getPrix();
+                }
                 int nombrePlaces = config.getNombrePlaces();
-                
+
                 for (int i = 0; i < nombrePlaces; i++) {
                     prixParPlace.add(prix);
                 }

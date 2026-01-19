@@ -39,12 +39,6 @@ public class FilmController {
             Model model, 
             HttpSession session
     ) {
-        // Vérification session
-        User user = (User) session.getAttribute("user");
-        if (user == null) {
-            return "redirect:/";
-        }
-        
         List<Film> films;
         if (search != null && !search.isEmpty()) {
             films = filmService.getAllFilms().stream()
@@ -65,11 +59,6 @@ public class FilmController {
      */
     @GetMapping("/{id}")
     public String detailFilm(@PathVariable Long id, Model model, HttpSession session) {
-        // Vérification session
-        User user = (User) session.getAttribute("user");
-        if (user == null) {
-            return "redirect:/";
-        }
         
         Film film = filmService.getFilmById(id);
         if (film == null) {
@@ -85,14 +74,6 @@ public class FilmController {
     @GetMapping("/nouveau")
     public String nouveauFilmForm(Model model, HttpSession session) {
         // Vérification session et rôle
-        User user = (User) session.getAttribute("user");
-        if (user == null) {
-            return "redirect:/";
-        }
-        String roleName = user.getRole().getNomRole();
-        if (!"Admin".equals(roleName) && !"Manager".equals(roleName)) {
-            return "redirect:/films?error=unauthorized";
-        }
         model.addAttribute("film", new Film());
         model.addAttribute("mode", "create");
         
@@ -105,14 +86,6 @@ public class FilmController {
     @GetMapping("/{id}/modifier")
     public String modifierFilmForm(@PathVariable Long id, Model model, HttpSession session) {
         // Vérification session et rôle
-        User user = (User) session.getAttribute("user");
-        if (user == null) {
-            return "redirect:/";
-        }
-        String roleName = user.getRole().getNomRole();
-        if (!"Admin".equals(roleName) && !"Manager".equals(roleName)) {
-            return "redirect:/films?error=unauthorized";
-        }
         
         Film film = filmService.getFilmById(id);
         if (film == null) {
@@ -131,15 +104,6 @@ public class FilmController {
             HttpSession session,
             RedirectAttributes redirectAttributes
     ) {
-        // Vérification session et rôle
-        User user = (User) session.getAttribute("user");
-        if (user == null) {
-            return "redirect:/";
-        }
-        String roleName = user.getRole().getNomRole();
-        if (!"Admin".equals(roleName) && !"Manager".equals(roleName)) {
-            return "redirect:/films?error=unauthorized";
-        }
         
         try {
             // Save

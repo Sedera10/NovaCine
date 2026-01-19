@@ -45,10 +45,13 @@ CREATE TABLE places (
    id_place SERIAL PRIMARY KEY,
    code_place VARCHAR(10) NOT NULL, -- ex: A1, B3
    id_salle INTEGER NOT NULL,
+   id_type_place INTEGER,
    dt_creation TIMESTAMP DEFAULT NOW(),
    UNIQUE (code_place, id_salle),
    FOREIGN KEY (id_salle) REFERENCES salles(id_salle) 
-       ON DELETE CASCADE ON UPDATE CASCADE
+       ON DELETE CASCADE ON UPDATE CASCADE,
+   FOREIGN KEY (id_type_place) REFERENCES type_places(id_type_place)
+       ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 CREATE TABLE seances (
@@ -65,40 +68,30 @@ CREATE TABLE seances (
    UNIQUE (daty, heure, id_salle)
 );
 
-CREATE TABLE billets (
-   id_billet SERIAL PRIMARY KEY,
-   id_place INTEGER NOT NULL,
-   id_seance INTEGER NOT NULL,
-   prix NUMERIC(10,2) NOT NULL,
-   dt_creation TIMESTAMP NOT NULL DEFAULT NOW(),
-   UNIQUE (id_place, id_seance),
-   FOREIGN KEY (id_place) REFERENCES places(id_place) 
-       ON DELETE CASCADE ON UPDATE CASCADE,
-   FOREIGN KEY (id_seance) REFERENCES seances(id_seance) 
-       ON DELETE CASCADE ON UPDATE CASCADE
-);
 CREATE TABLE achats (
    id_achat SERIAL PRIMARY KEY,
    dt_achat TIMESTAMP NOT NULL DEFAULT NOW(),
    nom_acheteur VARCHAR(100),
    total NUMERIC(10,2) NOT NULL
 );
-CREATE TABLE achat_billets (
+
+CREATE TABLE achats_billets(
+   id_achat_billet SERIAL,
+   id_place INTEGER NOT NULL,
+   id_seance INTEGER NOT NULL,
    id_achat INTEGER NOT NULL,
-   id_billet INTEGER NOT NULL,
-   PRIMARY KEY (id_achat, id_billet),
-   FOREIGN KEY (id_achat) REFERENCES achats(id_achat) 
-       ON DELETE CASCADE ON UPDATE CASCADE,
-   FOREIGN KEY (id_billet) REFERENCES billets(id_billet) 
-       ON DELETE CASCADE ON UPDATE CASCADE
+   PRIMARY KEY(id_achat_billet),
+   FOREIGN KEY(id_place) REFERENCES places(id_place),
+   FOREIGN KEY(id_seance) REFERENCES seances(id_seance),
+   FOREIGN KEY(id_achat) REFERENCES achats(id_achat)
 );
+
 
 -- projet 15 janvier
 
 CREATE TABLE type_places (
    id_type_place SERIAL PRIMARY KEY,
-   nom VARCHAR(50) NOT NULL,
-   prix NUMERIC(15,2) NOT NULL
+   nom VARCHAR(50) NOT NULL
 );
 
 CREATE TABLE config_salles (
@@ -112,5 +105,32 @@ CREATE TABLE config_salles (
 
    UNIQUE (id_salle, id_type_place)
 );
+
+CREATE TABLE type_personnes (
+   id_type_personne SERIAL PRIMARY KEY,
+   nom VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE config_seances (
+   id_config_seance SERIAL PRIMARY KEY,
+   id_seance INTEGER NOT NULL,
+   id_type_place INTEGER NOT NULL,
+   prix NUMERIC(15,2) NOT NULL,
+
+   FOREIGN KEY (id_seance) REFERENCES seances(id_seance) ON DELETE CASCADE,
+   FOREIGN KEY (id_type_place) REFERENCES type_places(id_type_place),
+
+   UNIQUE (id_seance, id_type_place)
+);
+
+CREATE TABLE config_remise_personnes(
+   id_config_remise_personne SERIAL PRIMARY KEY,
+   id_type_personne INTEGER NOT NULL,
+   remise NUMERIC(5,2) NOT NULL DEFAULT 0, -- Pourcentage de remise (ex: 50 pour -50%)
+   
+   FOREIGN KEY(id_type_personne) REFERENCES type_personnes(id_type_personne),
+   UNIQUE (id_type_personne)
+);
+
 
 

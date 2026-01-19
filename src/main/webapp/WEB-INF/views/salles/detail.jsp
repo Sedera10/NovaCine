@@ -238,14 +238,17 @@
                                                         <c:when test="${typeClass == 'premium'}">
                                                             <i class="bi bi-star-fill text-warning"></i>
                                                         </c:when>
+                                                        <c:when test="${typeClass == 'vip'}">
+                                                            <i class="bi bi-gem text-danger"></i>
+                                                        </c:when>
                                                         <c:otherwise>
                                                             <i class="bi bi-check-circle-fill text-success"></i>
                                                         </c:otherwise>
                                                     </c:choose>
                                                     ${config.typePlace.nom}
                                                 </div>
-                                                <div class="config-prix">
-                                                    <fmt:formatNumber value="${config.typePlace.prix}" pattern="#,##0"/> Ar / place
+                                                <div class="config-prix text-muted">
+                                                    <small><i class="bi bi-info-circle"></i> Prix configuré par séance</small>
                                                 </div>
                                             </div>
                                         </div>

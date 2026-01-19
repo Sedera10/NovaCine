@@ -21,6 +21,10 @@ public class Place {
     @JoinColumn(name = "id_salle", nullable = false)
     private Salle salle;
     
+    @ManyToOne
+    @JoinColumn(name = "id_type_place")
+    private TypePlace typePlace;
+    
     @Column(name = "dt_creation")
     private LocalDateTime dtCreation;
     
@@ -35,6 +39,13 @@ public class Place {
     public Place(String codePlace, Salle salle) {
         this.codePlace = codePlace;
         this.salle = salle;
+        this.dtCreation = LocalDateTime.now();
+    }
+    
+    public Place(String codePlace, Salle salle, TypePlace typePlace) {
+        this.codePlace = codePlace;
+        this.salle = salle;
+        this.typePlace = typePlace;
         this.dtCreation = LocalDateTime.now();
     }
 
@@ -61,6 +72,14 @@ public class Place {
 
     public void setSalle(Salle salle) {
         this.salle = salle;
+    }
+    
+    public TypePlace getTypePlace() {
+        return typePlace;
+    }
+    
+    public void setTypePlace(TypePlace typePlace) {
+        this.typePlace = typePlace;
     }
 
     public LocalDateTime getDtCreation() {

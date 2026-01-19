@@ -49,21 +49,7 @@ public class HomeController {
         
         User user = authService.authenticate(username, password);
         
-        if (user != null) {
-            session.setAttribute("user", user);
-            if (rememberMe != null) {
-                session.setMaxInactiveInterval(30 * 24 * 60 * 60); // 30 jours
-            } else {
-                session.setMaxInactiveInterval(30 * 60); // 30 minutes
-            }
-            
-            return "redirect:/seances";
-        } else {
-            // Authentification échouée
-            model.addAttribute("error", "Nom d'utilisateur ou mot de passe incorrect");
-            model.addAttribute("username", username);
-            return "index";
-        }
+        return "redirect:/seances";
     }
     
     // Deconnexion

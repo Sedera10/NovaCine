@@ -25,4 +25,8 @@ public class TypePlaceService {
     public TypePlace saveTypePlace(TypePlace typePlace) {
         return typePlaceRepository.save(typePlace);
     }
+
+    public void deleteTypePlace(Long id) {
+        typePlaceRepository.deleteById(id);
+    }
 }

@@ -373,38 +373,43 @@
         </li>
         
         <!-- Section: Gestion (Admin & Manager) -->
-        <c:if test="${user.role.nomRole eq 'Admin' or user.role.nomRole eq 'Manager'}">
-            <div class="sidebar-divider"></div>
-            <div class="sidebar-section-title">Gestion</div>
-            
-            <li class="sidebar-menu-item">
-                <a href="${pageContext.request.contextPath}/films" class="sidebar-menu-link">
-                    <span class="sidebar-menu-icon"><i class="bi bi-film"></i></span>
-                    <span class="sidebar-menu-text">Films</span>
-                </a>
-            </li>
-            
-            <li class="sidebar-menu-item">
-                <a href="${pageContext.request.contextPath}/seances" class="sidebar-menu-link">
-                    <span class="sidebar-menu-icon"><i class="bi bi-camera-reels"></i></span>
-                    <span class="sidebar-menu-text">Séances</span>
-                </a>
-            </li>
-            
-            <li class="sidebar-menu-item">
-                <a href="${pageContext.request.contextPath}/salles" class="sidebar-menu-link">
-                    <span class="sidebar-menu-icon"><i class="bi bi-door-open"></i></span>
-                    <span class="sidebar-menu-text">Salles</span>
-                </a>
-            </li>
-            
-            <li class="sidebar-menu-item">
-                <a href="${pageContext.request.contextPath}/concessions" class="sidebar-menu-link">
-                    <span class="sidebar-menu-icon"><i class="bi bi-cup-straw"></i></span>
-                    <span class="sidebar-menu-text">Concessions</span>
-                </a>
-            </li>
-        </c:if>
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-section-title">Gestion</div>
+        
+        <li class="sidebar-menu-item">
+            <a href="${pageContext.request.contextPath}/films" class="sidebar-menu-link">
+                <span class="sidebar-menu-icon"><i class="bi bi-film"></i></span>
+                <span class="sidebar-menu-text">Films</span>
+            </a>
+        </li>
+        
+        <li class="sidebar-menu-item">
+            <a href="${pageContext.request.contextPath}/seances" class="sidebar-menu-link">
+                <span class="sidebar-menu-icon"><i class="bi bi-camera-reels"></i></span>
+                <span class="sidebar-menu-text">Séances</span>
+            </a>
+        </li>
+        
+        <li class="sidebar-menu-item">
+            <a href="${pageContext.request.contextPath}/salles" class="sidebar-menu-link">
+                <span class="sidebar-menu-icon"><i class="bi bi-door-open"></i></span>
+                <span class="sidebar-menu-text">Salles</span>
+            </a>
+        </li>
+
+        <li class="sidebar-menu-item">
+            <a href="${pageContext.request.contextPath}/salles/types" class="sidebar-menu-link">
+                <span class="sidebar-menu-icon"><i class="bi bi-door-open"></i></span>
+                <span class="sidebar-menu-text">Types places</span>
+            </a>
+        </li>
+        
+        <li class="sidebar-menu-item">
+            <a href="${pageContext.request.contextPath}/concessions" class="sidebar-menu-link">
+                <span class="sidebar-menu-icon"><i class="bi bi-cup-straw"></i></span>
+                <span class="sidebar-menu-text">Concessions</span>
+            </a>
+        </li>
         
         <!-- Section: Rapports (Admin & Manager) -->
         <c:if test="${user.role.nomRole eq 'Admin' or user.role.nomRole eq 'Manager'}">

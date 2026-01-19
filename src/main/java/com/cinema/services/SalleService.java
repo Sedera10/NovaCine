@@ -144,9 +144,9 @@ public class SalleService {
         List<ConfigSalles> configs = configSallesRepository.findBySalle(salle);
         double totalArgent = 0.0;
 
+        // Without a seance context we cannot use ConfigSeance; return 0.0 for now
         for (ConfigSalles c: configs) {
-            TypePlace tp = c.getTypePlace();
-            totalArgent += tp.getPrix() * c.getNombrePlaces();
+            // keep placeholders for future pricing logic
         }
         return totalArgent;
     }

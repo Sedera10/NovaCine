@@ -41,11 +41,6 @@ public class SalleController {
             Model model, 
             HttpSession session
     ) {
-        // Vérification session
-        User user = (User) session.getAttribute("user");
-        if (user == null) {
-            return "redirect:/";
-        }
         
         List<Salle> salles;
         if (search != null && !search.isEmpty()) {
@@ -60,6 +55,66 @@ public class SalleController {
         model.addAttribute("search", search);
         
         return "salles/list";
+    }
+
+    /* ----------------------------- TypePlace CRUD (within SalleController) ----------------------------- */
+    @GetMapping("/types")
+    public String listTypesPlaces(@RequestParam(required = false) Long editId, Model model, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return "redirect:/";
+        }
+
+        List<TypePlace> typesPlaces = typePlaceService.getAllTypesPlaces();
+        model.addAttribute("typesPlaces", typesPlaces);
+
+        if (editId != null) {
+            TypePlace editing = typePlaceService.getTypePlaceById(editId);
+            model.addAttribute("editingType", editing);
+        } else {
+            model.addAttribute("editingType", new TypePlace());
+        }
+
+        return "salles/TypePlace";
+    }
+
+    @PostMapping("/types")
+    public String createTypePlace(@RequestParam String nom,
+                                  RedirectAttributes redirectAttributes) {
+        try {
+            TypePlace tp = new TypePlace(nom);
+            typePlaceService.saveTypePlace(tp);
+            redirectAttributes.addFlashAttribute("success", "Type de place créé avec succès");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/salles/types";
+    }
+
+    @PostMapping("/types/{id}/modifier")
+    public String updateTypePlace(@PathVariable Long id,
+                                  @RequestParam String nom,
+                                  RedirectAttributes redirectAttributes) {
+        try {
+            TypePlace tp = typePlaceService.getTypePlaceById(id);
+            tp.setNom(nom);
+            typePlaceService.saveTypePlace(tp);
+            redirectAttributes.addFlashAttribute("success", "Type de place mis à jour");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/salles/types";
+    }
+
+    @PostMapping("/types/{id}/supprimer")
+    public String deleteTypePlace(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            typePlaceService.deleteTypePlace(id);
+            redirectAttributes.addFlashAttribute("success", "Type de place supprimé");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/salles/types";
     }
 
     @GetMapping("/nouveau")
@@ -121,10 +176,6 @@ public class SalleController {
     @GetMapping("/{id}")
     public String getById(@PathVariable Long id, Model model, HttpSession session) {
         // Vérification session
-        User user = (User) session.getAttribute("user");
-        if (user == null) {
-            return "redirect:/";
-        }
         
         Salle salle = salleService.getSalleById(id);
         List<ConfigSalles> configurations = salleService.getConfigurationsSalle(id);

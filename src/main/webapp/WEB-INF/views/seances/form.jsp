@@ -237,6 +237,39 @@
                         </div>
                     </div>
                     
+                    <!-- Section Prix par Type de Place -->
+                    <div class="form-section">
+                        <h5><i class="bi bi-currency-exchange me-2"></i>Configuration des Prix</h5>
+                        <p class="text-muted mb-3">Définissez le prix pour chaque type de place pour cette séance</p>
+                        
+                        <div class="row">
+                            <c:forEach var="typePlace" items="${typePlaces}">
+                                <div class="col-md-4 mb-3">
+                                    <label for="prix_${typePlace.id}" class="form-label">
+                                        <i class="bi bi-ticket-perforated me-1"></i>${typePlace.nom}
+                                    </label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" 
+                                               id="prix_${typePlace.id}" 
+                                               name="prix_${typePlace.id}" 
+                                               value="${prixParTypePlace[typePlace.id]}"
+                                               min="0" step="100" placeholder="0">
+                                        <span class="input-group-text">Ar</span>
+                                    </div>
+                                    <small class="text-muted">Prix de base pour ${typePlace.nom}</small>
+                                </div>
+                            </c:forEach>
+                        </div>
+                        
+                        <c:if test="${empty typePlaces}">
+                            <div class="alert alert-warning">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                Aucun type de place n'est configuré. 
+                                <a href="${pageContext.request.contextPath}/salles/types-places">Configurer les types de places</a>
+                            </div>
+                        </c:if>
+                    </div>
+                    
                     <!-- Boutons d'action -->
                     <div class="d-flex gap-2 justify-content-end">
                         <a href="${pageContext.request.contextPath}/seances" class="btn btn-outline-secondary">

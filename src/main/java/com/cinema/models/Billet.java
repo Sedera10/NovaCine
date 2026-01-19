@@ -44,6 +44,11 @@ public class Billet {
         this.dtCreation = LocalDateTime.now();
     }
 
+    // Méthode utilitaire pour obtenir le type de place via la place
+    public TypePlace getTypePlace() {
+        return place != null ? place.getTypePlace() : null;
+    }
+
     // Getters et Setters
     public Long getIdBillet() {
         return idBillet;

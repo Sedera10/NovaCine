@@ -1,11 +1,7 @@
 package com.cinema.controllers;
 
-import com.cinema.models.Film;
-import com.cinema.models.Salle;
-import com.cinema.models.Seance;
-import com.cinema.services.FilmService;
-import com.cinema.services.SalleService;
-import com.cinema.services.SeanceService;
+import com.cinema.models.*;
+import com.cinema.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
@@ -13,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.HashMap;
@@ -31,6 +28,12 @@ public class SeanceController {
     
     @Autowired
     private SalleService salleService;
+    
+    @Autowired
+    private TypePlaceService typePlaceService;
+    
+    @Autowired
+    private ConfigSeanceService configSeanceService;
     
     /**
      * Page d'accueil : Liste des séances avec filtres
@@ -102,12 +105,14 @@ public class SeanceController {
     public String nouveauSeanceForm(Model model) {
         List<Film> films = filmService.getAllFilms();
         List<Salle> salles = salleService.getAllSalles();
+        List<TypePlace> typePlaces = typePlaceService.getAllTypesPlaces();
         LocalDate daty = LocalDate.now();
         
         model.addAttribute("films", films);
         model.addAttribute("salles", salles);
+        model.addAttribute("typePlaces", typePlaces);
         model.addAttribute("seance", new Seance());
-        model.addAttribute("defaultDate",daty);
+        model.addAttribute("defaultDate", daty);
         
         return "seances/form";
     }
@@ -121,10 +126,22 @@ public class SeanceController {
             @RequestParam Long idSalle,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dtSeance,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime heureDebut,
+            @RequestParam(required = false) Map<String, String> allParams,
             RedirectAttributes redirectAttributes) {
         
         try {
             Seance seance = seanceService.createSeance(idFilm, idSalle, dtSeance, heureDebut);
+            
+            // Enregistrer les prix par type de place
+            List<TypePlace> typePlaces = typePlaceService.getAllTypesPlaces();
+            for (TypePlace tp : typePlaces) {
+                String prixParam = allParams.get("prix_" + tp.getId());
+                if (prixParam != null && !prixParam.trim().isEmpty()) {
+                    BigDecimal prix = new BigDecimal(prixParam);
+                    configSeanceService.saveOrUpdate(seance, tp, prix);
+                }
+            }
+            
             redirectAttributes.addFlashAttribute("success", "Séance créée avec succès");
             return "redirect:/seances";
         } catch (Exception e) {
@@ -141,10 +158,20 @@ public class SeanceController {
         Seance seance = seanceService.getSeanceById(id);
         List<Film> films = filmService.getAllFilms();
         List<Salle> salles = salleService.getAllSalles();
+        List<TypePlace> typePlaces = typePlaceService.getAllTypesPlaces();
+        
+        // Récupérer les prix existants
+        List<ConfigSeance> configSeances = configSeanceService.getConfigsBySeance(id);
+        Map<Long, BigDecimal> prixParTypePlace = new HashMap<>();
+        for (ConfigSeance cs : configSeances) {
+            prixParTypePlace.put(cs.getTypePlace().getId(), cs.getPrix());
+        }
         
         model.addAttribute("seance", seance);
         model.addAttribute("films", films);
         model.addAttribute("salles", salles);
+        model.addAttribute("typePlaces", typePlaces);
+        model.addAttribute("prixParTypePlace", prixParTypePlace);
         
         return "seances/form";
     }
@@ -159,10 +186,22 @@ public class SeanceController {
             @RequestParam Long idSalle,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate daty,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime heure,
+            @RequestParam(required = false) Map<String, String> allParams,
             RedirectAttributes redirectAttributes) {
         
         try {
-            seanceService.updateSeance(id, daty, heure, idFilm, idSalle);
+            Seance seance = seanceService.updateSeance(id, daty, heure, idFilm, idSalle);
+            
+            // Mettre à jour les prix par type de place
+            List<TypePlace> typePlaces = typePlaceService.getAllTypesPlaces();
+            for (TypePlace tp : typePlaces) {
+                String prixParam = allParams.get("prix_" + tp.getId());
+                if (prixParam != null && !prixParam.trim().isEmpty()) {
+                    BigDecimal prix = new BigDecimal(prixParam);
+                    configSeanceService.saveOrUpdate(seance, tp, prix);
+                }
+            }
+            
             redirectAttributes.addFlashAttribute("success", "Séance modifiée avec succès");
             return "redirect:/seances/" + id;
         } catch (Exception e) {

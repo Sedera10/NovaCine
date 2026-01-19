@@ -298,11 +298,10 @@
                         <h1 class="mb-2"><i class="bi bi-film me-2"></i>Séances de Cinéma</h1>
                         <p class="mb-0 opacity-75">Liste des Séances Completes</p>
                     </div>
-                    <c:if test="${user.role.nomRole eq 'Admin' or user.role.nomRole eq 'Manager'}">
-                        <a href="${pageContext.request.contextPath}/seances/nouveau" class="btn-warning-custom">
-                            <i class="bi bi-plus-circle me-2"></i>Nouveau séance
-                        </a>
-                    </c:if>
+                    <a href="${pageContext.request.contextPath}/seances/nouveau" class="btn-warning-custom">
+                        <i class="bi bi-plus-circle me-2"></i>Nouveau séance
+                    </a>
+                    
                 </div>
                 <!-- <h1><i class="bi bi-calendar-event me-2"></i>Séances de Cinéma</h1> -->
             </div>

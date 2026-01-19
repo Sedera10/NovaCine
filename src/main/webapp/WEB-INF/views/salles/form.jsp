@@ -223,7 +223,7 @@
                                 <c:forEach var="typePlace" items="${typesPlaces}">
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">
-                                            <i class="bi bi-tag-fill"></i> ${typePlace.nom} (${typePlace.prix} Ar)
+                                            <i class="bi bi-tag-fill"></i> ${typePlace.nom}
                                         </label>
                                         <input type="number" 
                                                class="form-control config-place" 

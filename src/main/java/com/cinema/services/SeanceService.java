@@ -38,6 +38,9 @@ public class SeanceService {
     @Autowired
     private ConfigSallesRepository configSallesRepository;
     
+    @Autowired
+    private com.cinema.repositories.ConfigSeanceRepository configSeanceRepository;
+    
     public List<Seance> getAllSeances() {
         return seanceRepository.findAll();
     }
@@ -101,9 +104,7 @@ public class SeanceService {
         
         Seance seance = new Seance(daty, heure, film, salle);
         Seance savedSeance = seanceRepository.save(seance);
-        // Générer automatiquement les billets avec les prix de la configuration de la salle
-        billetService.genererBilletsPourSeance(savedSeance);
-        
+        // Note: billets ne sont plus pré-générés, les achats utilisent directement les places et ConfigSeance pour le prix
         return savedSeance;
     }
     
@@ -135,8 +136,11 @@ public class SeanceService {
         double totalArgent = 0.0;
 
         for (ConfigSalles c: configs) {
-            TypePlace tp = c.getTypePlace();
-            totalArgent += tp.getPrix() * c.getNombrePlaces();
+            // Use ConfigSeance price for this seance and typePlace; fallback to 0
+            com.cinema.models.ConfigSeance cfg = configSeanceRepository.findBySeanceIdSeanceAndTypePlaceId(id, c.getTypePlace().getId());
+            if (cfg != null && cfg.getPrix() != null) {
+                totalArgent += cfg.getPrix().doubleValue() * c.getNombrePlaces();
+            }
         }
         return totalArgent;
     }

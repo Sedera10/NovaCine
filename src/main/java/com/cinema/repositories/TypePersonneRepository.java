@@ -1,10 +1,9 @@
 package com.cinema.repositories;
 
-import com.cinema.models.TypePlace;
+import com.cinema.models.TypePersonne;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface TypePlaceRepository extends JpaRepository<TypePlace, Long>{
-    TypePlace findByNom(String nom);
+public interface TypePersonneRepository extends JpaRepository<TypePersonne, Long> {
 }
