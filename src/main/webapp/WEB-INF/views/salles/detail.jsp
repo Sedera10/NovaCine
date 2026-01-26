@@ -12,6 +12,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${salle.nom} - Détails - NovaCine</title>
+    <link rel="icon" type="image/png" href="${pageContext.request.contextPath}/images/NovaCine.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <style>
@@ -201,7 +202,7 @@
                         </div>
                         <div class="info-item">
                             <span class="info-label">Configuration:</span>
-                            <span class="info-value">${salle.nbRangee} rangées × ${salle.nbColonne} colonnes</span>
+                            <span class="info-value">${not empty configurations ? configurations.size() : 0} types — ${salle.capacite} places</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Date de création:</span>
@@ -232,11 +233,14 @@
                                         <div class="col-md-6">
                                             <c:set var="typeClass" value="${config.typePlace.nom.toLowerCase().contains('premium') ? 'premium' : 'standard'}" />
                                             <div class="config-card ${typeClass}">
-                                                <div class="config-nombre">${config.nombrePlaces}</div>
+                                                <div class="config-nombre">${config.nombre}</div>
                                                 <div class="config-type">
                                                     <c:choose>
                                                         <c:when test="${typeClass == 'premium'}">
                                                             <i class="bi bi-star-fill text-warning"></i>
+                                                        </c:when>
+                                                        <c:when test="${typeClass == 'vip'}">
+                                                            <i class="bi bi-gem text-danger"></i>
                                                         </c:when>
                                                         <c:otherwise>
                                                             <i class="bi bi-check-circle-fill text-success"></i>
@@ -244,8 +248,8 @@
                                                     </c:choose>
                                                     ${config.typePlace.nom}
                                                 </div>
-                                                <div class="config-prix">
-                                                    <fmt:formatNumber value="${config.typePlace.prix}" pattern="#,##0"/> Ar / place
+                                                <div class="config-prix text-muted">
+                                                    <small><i class="bi bi-info-circle"></i> Prix configuré par séance</small>
                                                 </div>
                                             </div>
                                         </div>
@@ -266,11 +270,11 @@
                         <div class="info-card">
                             <h5><i class="bi bi-bar-chart"></i> Répartition des Places</h5>
                             <c:forEach items="${configurations}" var="config">
-                                <c:set var="pourcentage" value="${(config.nombrePlaces * 100) / salle.capacite}" />
+                                <c:set var="pourcentage" value="${(config.nombre * 100) / salle.capacite}" />
                                 <div class="mb-3">
                                     <div class="d-flex justify-content-between mb-1">
                                         <span class="info-label">${config.typePlace.nom}</span>
-                                        <span>${config.nombrePlaces} places (${String.format("%.0f", pourcentage)}%)</span>
+                                        <span>${config.nombre} places (${String.format("%.0f", pourcentage)}%)</span>
                                     </div>
                                     <div class="progress" style="height: 20px;">
                                         <c:set var="barColor" value="${config.typePlace.nom.toLowerCase().contains('premium') ? 'bg-warning' : 'bg-success'}" />

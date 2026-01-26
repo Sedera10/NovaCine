@@ -2,15 +2,13 @@ package com.cinema.models;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "config_salles",
-    uniqueConstraints = @UniqueConstraint(columnNames = {"id_salle", "id_type_place"})
-)
+@Table(name = "salles_configs")
 public class ConfigSalles {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_config_salle")
-    private Long idConfigSalle;
+    @Column(name = "id_salle_config")
+    private Long idSalleConfig;
 
     @ManyToOne
     @JoinColumn(name = "id_salle", nullable = false)
@@ -20,26 +18,26 @@ public class ConfigSalles {
     @JoinColumn(name = "id_type_place", nullable = false)
     private TypePlace typePlace;
 
-    @Column(name = "nombre_places", nullable = false)
-    private Integer nombrePlaces;
+    @Column(name = "nombre", nullable = false)
+    private Integer nombre;
 
     // Constructeurs
     public ConfigSalles() {
     }
 
-    public ConfigSalles(Salle salle, TypePlace typePlace, Integer nombrePlaces) {
+    public ConfigSalles(Salle salle, TypePlace typePlace, Integer nombre) {
         this.salle = salle;
         this.typePlace = typePlace;
-        this.nombrePlaces = nombrePlaces;
+        this.nombre = nombre;
     }
 
     // Getters et Setters
-    public Long getIdConfigSalle() {
-        return idConfigSalle;
+    public Long getIdSalleConfig() {
+        return idSalleConfig;
     }
 
-    public void setIdConfigSalle(Long idConfigSalle) {
-        this.idConfigSalle = idConfigSalle;
+    public void setIdSalleConfig(Long idSalleConfig) {
+        this.idSalleConfig = idSalleConfig;
     }
 
     public Salle getSalle() {
@@ -58,11 +56,11 @@ public class ConfigSalles {
         this.typePlace = typePlace;
     }
 
-    public Integer getNombrePlaces() {
-        return nombrePlaces;
+    public Integer getNombre() {
+        return nombre;
     }
 
-    public void setNombrePlaces(Integer nombrePlaces) {
-        this.nombrePlaces = nombrePlaces;
+    public void setNombre(Integer nombre) {
+        this.nombre = nombre;
     }
 }

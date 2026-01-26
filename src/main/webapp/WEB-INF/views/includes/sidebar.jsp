@@ -19,15 +19,31 @@
         color: var(--primary-color);
         transition: all 0.3s ease;
         z-index: 1000;
-        overflow-x: hidden;
-        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
         box-shadow: 0 1px 3px rgba(0,0,0,0.06);
     }
     
+    /* Make header fixed and menu scrollable */
+    .sidebar-header {
+        position: relative;
+        z-index: 2;
+    }
+
+    .sidebar-menu {
+        flex: 1 1 auto;
+        overflow-y: auto;
+        padding-bottom: 14px; /* room for footer */
+    }
+
     .sidebar.collapsed {
         width: var(--sidebar-collapsed-width);
     }
-    
+
+    .sidebar.collapsed .sidebar-logo img {
+        height: 40px; /* shrink logo when collapsed */
+        width: auto;
+    }    
     .sidebar-header {
         padding: 16px;
         display: flex;
@@ -66,15 +82,23 @@
         color: var(--primary-color);
         font-size: 1.3rem;
         cursor: pointer;
-        padding: 4px;
+        padding: 6px;
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: color 0.3s ease;
+        transition: color 0.2s ease, transform 0.2s ease;
+        position: absolute;
+        right: 12px;
+        top: 12px;
     }
-    
+
     .sidebar-toggle:hover {
         color: var(--secondary-color);
+    }
+
+    .sidebar.collapsed .sidebar-toggle {
+        color: var(--primary-color);
+        transform: rotate(0deg);
     }
     
     .sidebar-menu {
@@ -133,7 +157,30 @@
         margin-left: 12px;
         transition: opacity 0.3s ease;
     }
-    
+
+    /* Submenu (dropdown) */
+    .sidebar-submenu {
+        list-style: none;
+        padding-left: 0.75rem;
+        display: none;
+    }
+
+    .sidebar-submenu .sidebar-menu-link {
+        padding-left: 28px;
+        font-size: 0.95rem;
+    }
+
+    .sidebar-menu-item.open > .sidebar-submenu {
+        display: block;
+    }
+
+    .sidebar-menu-link.dropdown-toggle .bi-chevron-down {
+        transition: transform 0.2s ease;
+    }
+
+    .sidebar-menu-item.open > a.dropdown-toggle .bi-chevron-down {
+        transform: rotate(180deg);
+    }    
     .sidebar.collapsed .sidebar-menu-text {
         opacity: 0;
         display: none;
@@ -354,7 +401,7 @@
     <ul class="sidebar-menu">
         <!-- Dashboard -->
         <li class="sidebar-menu-item">
-            <a href="${pageContext.request.contextPath}/dashboard" class="sidebar-menu-link active">
+            <a href="${pageContext.request.contextPath}/dashboard" class="sidebar-menu-link">
                 <span class="sidebar-menu-icon"><i class="bi bi-speedometer2"></i></span>
                 <span class="sidebar-menu-text">Dashboard</span>
             </a>
@@ -365,66 +412,134 @@
         <!-- Section: Vente -->
         <div class="sidebar-section-title">Vente</div>
         
-        <li class="sidebar-menu-item">
-            <a href="${pageContext.request.contextPath}/achats/liste" class="sidebar-menu-link">
+        <li class="sidebar-menu-item sidebar-dropdown" id="menu-ventes">
+            <a href="#" class="sidebar-menu-link dropdown-toggle" data-target="#submenu-ventes">
                 <span class="sidebar-menu-icon"><i class="bi bi-ticket-perforated"></i></span>
-                <span class="sidebar-menu-text">Vente Billets</span>
+                <span class="sidebar-menu-text">Ventes billets</span>
+                <span class="ms-auto"></span>
             </a>
+            <ul class="sidebar-submenu" id="submenu-ventes">
+                <li><a href="${pageContext.request.contextPath}/achats" class="sidebar-menu-link"><i class="bi bi-list me-2"></i> Liste</a></li>
+                <li><a href="${pageContext.request.contextPath}/achats/nouveau" class="sidebar-menu-link"><i class="bi bi-plus-circle me-2"></i> Créer</a></li>
+            </ul>
         </li>
         
         <!-- Section: Gestion (Admin & Manager) -->
-        <c:if test="${user.role.nomRole eq 'Admin' or user.role.nomRole eq 'Manager'}">
-            <div class="sidebar-divider"></div>
-            <div class="sidebar-section-title">Gestion</div>
-            
-            <li class="sidebar-menu-item">
-                <a href="${pageContext.request.contextPath}/films" class="sidebar-menu-link">
-                    <span class="sidebar-menu-icon"><i class="bi bi-film"></i></span>
-                    <span class="sidebar-menu-text">Films</span>
-                </a>
-            </li>
-            
-            <li class="sidebar-menu-item">
-                <a href="${pageContext.request.contextPath}/seances" class="sidebar-menu-link">
-                    <span class="sidebar-menu-icon"><i class="bi bi-camera-reels"></i></span>
-                    <span class="sidebar-menu-text">Séances</span>
-                </a>
-            </li>
-            
-            <li class="sidebar-menu-item">
-                <a href="${pageContext.request.contextPath}/salles" class="sidebar-menu-link">
-                    <span class="sidebar-menu-icon"><i class="bi bi-door-open"></i></span>
-                    <span class="sidebar-menu-text">Salles</span>
-                </a>
-            </li>
-            
-            <li class="sidebar-menu-item">
-                <a href="${pageContext.request.contextPath}/concessions" class="sidebar-menu-link">
-                    <span class="sidebar-menu-icon"><i class="bi bi-cup-straw"></i></span>
-                    <span class="sidebar-menu-text">Concessions</span>
-                </a>
-            </li>
-        </c:if>
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-section-title">Gestion</div>
+        
+        <li class="sidebar-menu-item sidebar-dropdown" id="menu-films">
+            <a href="#" class="sidebar-menu-link dropdown-toggle" data-target="#submenu-films">
+                <span class="sidebar-menu-icon"><i class="bi bi-film"></i></span>
+                <span class="sidebar-menu-text">Films</span>
+                <span class="ms-auto"></span>
+            </a>
+            <ul class="sidebar-submenu" id="submenu-films">
+                <li><a href="${pageContext.request.contextPath}/films" class="sidebar-menu-link"><i class="bi bi-list me-2"></i> Liste</a></li>
+                <li><a href="${pageContext.request.contextPath}/films/nouveau" class="sidebar-menu-link"><i class="bi bi-plus-circle me-2"></i> Créer</a></li>
+            </ul>
+        </li>
+
+        <li class="sidebar-menu-item sidebar-dropdown" id="menu-seances">
+            <a href="#" class="sidebar-menu-link dropdown-toggle" data-target="#submenu-seances">
+                <span class="sidebar-menu-icon"><i class="bi bi-camera-reels"></i></span>
+                <span class="sidebar-menu-text">Séances</span>
+                <span class="ms-auto"></span>
+            </a>
+            <ul class="sidebar-submenu" id="submenu-seances">
+                <li><a href="${pageContext.request.contextPath}/seances" class="sidebar-menu-link"><i class="bi bi-list me-2"></i> Liste</a></li>
+                <li><a href="${pageContext.request.contextPath}/seances/nouveau" class="sidebar-menu-link"><i class="bi bi-plus-circle me-2"></i> Créer</a></li>
+            </ul>
+        </li>
+
+        <li class="sidebar-menu-item sidebar-dropdown" id="menu-salles">
+            <a href="#" class="sidebar-menu-link dropdown-toggle" data-target="#submenu-salles">
+                <span class="sidebar-menu-icon"><i class="bi bi-door-open"></i></span>
+                <span class="sidebar-menu-text">Salles</span>
+                <span class="ms-auto"></span>
+            </a>
+            <ul class="sidebar-submenu" id="submenu-salles">
+                <li><a href="${pageContext.request.contextPath}/salles" class="sidebar-menu-link"><i class="bi bi-list me-2"></i> Liste</a></li>
+                <li><a href="${pageContext.request.contextPath}/salles/nouveau" class="sidebar-menu-link"><i class="bi bi-plus-circle me-2"></i> Créer</a></li>
+            </ul>
+        </li>
+
+        <div class="sidebar-divider"></div>
+        
+        <!-- Section: Publicité -->
+        <div class="sidebar-section-title">Publicité</div>
+        
+        <li class="sidebar-menu-item">
+            <a href="${pageContext.request.contextPath}/publicite/diffusions" class="sidebar-menu-link">
+                <span class="sidebar-menu-icon"><i class="bi bi-play-circle"></i></span>
+                <span class="sidebar-menu-text">Diffuser</span>
+            </a>
+        </li>
+        
+        <li class="sidebar-menu-item">
+            <a href="${pageContext.request.contextPath}/publicite/rapport" class="sidebar-menu-link">
+                <span class="sidebar-menu-icon"><i class="bi bi-file-earmark-bar-graph"></i></span>
+                <span class="sidebar-menu-text">Rapport</span>
+            </a>
+        </li>
+        
+        <li class="sidebar-menu-item">
+            <a href="${pageContext.request.contextPath}/publicite/paiements" class="sidebar-menu-link">
+                <span class="sidebar-menu-icon"><i class="bi bi-cash-coin"></i></span>
+                <span class="sidebar-menu-text">Paiements</span>
+            </a>
+        </li>
+        
+        <li class="sidebar-menu-item">
+            <a href="${pageContext.request.contextPath}/publicite/configurations" class="sidebar-menu-link">
+                <span class="sidebar-menu-icon"><i class="bi bi-gear"></i></span>
+                <span class="sidebar-menu-text">Configurations</span>
+            </a>
+        </li>
+
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-section-title">Configurations</div>
+
+        <li class="sidebar-menu-item sidebar-dropdown" id="menu-types-places">
+            <a href="#" class="sidebar-menu-link dropdown-toggle" data-target="#submenu-types-places">
+                <span class="sidebar-menu-icon"><i class="bi bi-door-open"></i></span>
+                <span class="sidebar-menu-text">Types places</span>
+                <span class="ms-auto"></span>
+            </a>
+            <ul class="sidebar-submenu" id="submenu-types-places">
+                <li><a href="${pageContext.request.contextPath}/salles/types-places" class="sidebar-menu-link"><i class="bi bi-list me-2"></i> Liste</a></li>
+            </ul>
+        </li>
+
+        <li class="sidebar-menu-item sidebar-dropdown" id="menu-type-clients">
+            <a href="#" class="sidebar-menu-link dropdown-toggle" data-target="#submenu-type-clients">
+                <span class="sidebar-menu-icon"><i class="bi bi-people-fill"></i></span>
+                <span class="sidebar-menu-text">Type Client</span>
+                <span class="ms-auto"></span>
+            </a>
+            <ul class="sidebar-submenu" id="submenu-type-clients">
+                <li><a href="${pageContext.request.contextPath}/type-clients" class="sidebar-menu-link"><i class="bi bi-list me-2"></i> Liste</a></li>
+            </ul>
+        </li>
+        
+        <li class="sidebar-menu-item">
+            <a href="${pageContext.request.contextPath}/concessions" class="sidebar-menu-link">
+                <span class="sidebar-menu-icon"><i class="bi bi-cup-straw"></i></span>
+                <span class="sidebar-menu-text">Concessions</span>
+            </a>
+        </li>
         
         <!-- Section: Rapports (Admin & Manager) -->
-        <c:if test="${user.role.nomRole eq 'Admin' or user.role.nomRole eq 'Manager'}">
-            <div class="sidebar-divider"></div>
-            <div class="sidebar-section-title">Rapports</div>
-            
-            <li class="sidebar-menu-item">
-                <a href="${pageContext.request.contextPath}/statistiques" class="sidebar-menu-link">
-                    <span class="sidebar-menu-icon"><i class="bi bi-graph-up"></i></span>
-                    <span class="sidebar-menu-text">Statistiques</span>
-                </a>
-            </li>
-            
-            <li class="sidebar-menu-item">
-                <a href="${pageContext.request.contextPath}/rapports" class="sidebar-menu-link">
-                    <span class="sidebar-menu-icon"><i class="bi bi-file-earmark-bar-graph"></i></span>
-                    <span class="sidebar-menu-text">Rapports</span>
-                </a>
-            </li>
-        </c:if>
+
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-section-title">Rapports</div>
+        
+        <li class="sidebar-menu-item">
+            <a href="${pageContext.request.contextPath}/statistiques/seances" class="sidebar-menu-link">
+                <span class="sidebar-menu-icon"><i class="bi bi-graph-up"></i></span>
+                <span class="sidebar-menu-text">Statistiques</span>
+            </a>
+        </li>
         
         <!-- Section: Administration (Admin only) -->
         <div class="sidebar-divider"></div>
@@ -513,15 +628,29 @@
             }
         });
         
-        // Highlight active menu item based on current URL
+        // Dropdown toggle behavior (open/close submenu)
+        const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
+        dropdownToggles.forEach(toggle => {
+            toggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                const parent = this.closest('.sidebar-menu-item');
+                const open = parent.classList.contains('open');
+                // Close other open dropdowns (optional)
+                document.querySelectorAll('.sidebar-menu-item.open').forEach(item => item.classList.remove('open'));
+                if (!open) parent.classList.add('open');
+            });
+        });
+
+        // Highlight active menu item based on current URL (also open parent dropdown)
         const currentPath = window.location.pathname;
+        // close previous active
+        menuLinks.forEach(l => l.classList.remove('active'));
         menuLinks.forEach(link => {
-            if (link.getAttribute('href') === currentPath || 
-                (currentPath.includes(link.getAttribute('href')) && link.getAttribute('href') !== '${pageContext.request.contextPath}/dashboard')) {
-                // Remove active class from all links
-                menuLinks.forEach(l => l.classList.remove('active'));
-                // Add active class to current link
+            const href = link.getAttribute('href');
+            if (href && (href === currentPath || (currentPath.includes(href) && href !== '${pageContext.request.contextPath}/dashboard'))) {
                 link.classList.add('active');
+                const parentDropdown = link.closest('.sidebar-menu-item.sidebar-dropdown');
+                if (parentDropdown) parentDropdown.classList.add('open');
             }
         });
     });

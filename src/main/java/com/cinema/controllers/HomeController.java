@@ -49,21 +49,7 @@ public class HomeController {
         
         User user = authService.authenticate(username, password);
         
-        if (user != null) {
-            session.setAttribute("user", user);
-            if (rememberMe != null) {
-                session.setMaxInactiveInterval(30 * 24 * 60 * 60); // 30 jours
-            } else {
-                session.setMaxInactiveInterval(30 * 60); // 30 minutes
-            }
-            
-            return "redirect:/seances";
-        } else {
-            // Authentification échouée
-            model.addAttribute("error", "Nom d'utilisateur ou mot de passe incorrect");
-            model.addAttribute("username", username);
-            return "index";
-        }
+        return "redirect:/salles";
     }
     
     // Deconnexion
@@ -71,16 +57,5 @@ public class HomeController {
     public String logout(HttpSession session) {
         session.invalidate();
         return "redirect:/";
-    }
-
-    //DashBoard
-    @GetMapping("/dashboard")
-    public String dashboard(HttpSession session, Model model) {
-        User user = (User) session.getAttribute("user");
-        if (user == null) {
-            return "redirect:/";
-        }
-        
-        return "admin/dashboard";
     }
 }

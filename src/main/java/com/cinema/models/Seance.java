@@ -7,8 +7,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "seances",
-       uniqueConstraints = @UniqueConstraint(columnNames = {"daty", "heure", "id_salle"}))
+@Table(name = "seances")
 public class Seance {
     
     @Id
@@ -16,11 +15,11 @@ public class Seance {
     @Column(name = "id_seance")
     private Long idSeance;
     
-    @Column(name = "daty", nullable = false)
-    private LocalDate daty;
+    @Column(name = "date_seance", nullable = false)
+    private LocalDate dateSeance;
     
-    @Column(name = "heure", nullable = false)
-    private LocalTime heure;
+    @Column(name = "heure_seance", nullable = false)
+    private LocalTime heureSeance;
     
     @Column(name = "dt_creation", nullable = false)
     private LocalDateTime dtCreation;
@@ -34,16 +33,25 @@ public class Seance {
     private Salle salle;
     
     @OneToMany(mappedBy = "seance", cascade = CascadeType.ALL)
-    private List<Billet> billets;
+    private List<Reservation> reservations;
+    
+    @OneToMany(mappedBy = "seance", cascade = CascadeType.ALL)
+    private List<Achat> achats;
+    
+    @OneToMany(mappedBy = "seance", cascade = CascadeType.ALL)
+    private List<Tarif> tarifs;
+    
+    @OneToMany(mappedBy = "seance", cascade = CascadeType.ALL)
+    private List<Diffusion> diffusionsPub;
 
     // Constructeurs
     public Seance() {
         this.dtCreation = LocalDateTime.now();
     }
 
-    public Seance(LocalDate daty, LocalTime heure, Film film, Salle salle) {
-        this.daty = daty;
-        this.heure = heure;
+    public Seance(LocalDate dateSeance, LocalTime heureSeance, Film film, Salle salle) {
+        this.dateSeance = dateSeance;
+        this.heureSeance = heureSeance;
         this.film = film;
         this.salle = salle;
         this.dtCreation = LocalDateTime.now();
@@ -58,20 +66,20 @@ public class Seance {
         this.idSeance = idSeance;
     }
     
-    public LocalDate getDaty() {
-        return daty;
+    public LocalDate getDateSeance() {
+        return dateSeance;
     }
     
-    public void setDaty(LocalDate daty) {
-        this.daty = daty;
+    public void setDateSeance(LocalDate dateSeance) {
+        this.dateSeance = dateSeance;
     }
     
-    public LocalTime getHeure() {
-        return heure;
+    public LocalTime getHeureSeance() {
+        return heureSeance;
     }
     
-    public void setHeure(LocalTime heure) {
-        this.heure = heure;
+    public void setHeureSeance(LocalTime heureSeance) {
+        this.heureSeance = heureSeance;
     }
     
     public LocalDateTime getDtCreation() {
@@ -98,12 +106,36 @@ public class Seance {
         this.salle = salle;
     }
     
-    public List<Billet> getBillets() {
-        return billets;
+    public List<Reservation> getReservations() {
+        return reservations;
     }
     
-    public void setBillets(List<Billet> billets) {
-        this.billets = billets;
+    public void setReservations(List<Reservation> reservations) {
+        this.reservations = reservations;
+    }
+    
+    public List<Achat> getAchats() {
+        return achats;
+    }
+    
+    public void setAchats(List<Achat> achats) {
+        this.achats = achats;
+    }
+    
+    public List<Tarif> getTarifs() {
+        return tarifs;
+    }
+    
+    public void setTarifs(List<Tarif> tarifs) {
+        this.tarifs = tarifs;
+    }
+    
+    public List<Diffusion> getDiffusionsPub() {
+        return diffusionsPub;
+    }
+    
+    public void setDiffusionsPub(List<Diffusion> diffusionsPub) {
+        this.diffusionsPub = diffusionsPub;
     }
 }
 

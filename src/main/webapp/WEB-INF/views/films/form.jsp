@@ -151,7 +151,7 @@
                     <div class="mb-3">
                         <label for="poster" class="form-label">URL de l'affiche</label>
                         <input type="text" class="form-control" id="poster" name="poster" 
-                               value="${film.posterPath}" placeholder="/ifilm.jpg">
+                               value="${film.poster}" placeholder="/ifilm.jpg">
                         <small class="text-muted">Nom de l'image (film.jpg)</small>
                     </div>
                 </div>

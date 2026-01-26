@@ -26,8 +26,8 @@ public class Film {
     @Column(name = "duree")
     private Integer duree;
 
-    @Column(name = "poster_path", length = 255)
-    private String posterPath;
+    @Column(name = "poster", length = 255)
+    private String poster;
     
     @Column(name = "dt_creation", nullable = false)
     private LocalDateTime dtCreation;
@@ -40,12 +40,12 @@ public class Film {
         this.dtCreation = LocalDateTime.now();
     }
 
-    public Film(String titre, LocalDate dtSortie, String synopsis, Integer duree, String posterPath) {
+    public Film(String titre, LocalDate dtSortie, String synopsis, Integer duree, String poster) {
         this.titre = titre;
         this.dtSortie = dtSortie;
         this.synopsis = synopsis;
         this.duree = duree;
-        this.posterPath = posterPath;
+        this.poster = poster;
         this.dtCreation = LocalDateTime.now();
     }
     
@@ -98,12 +98,12 @@ public class Film {
         this.dtCreation = dtCreation;
     }
     
-    public String getPosterPath() {
-        return posterPath;
+    public String getPoster() {
+        return poster;
     }
     
-    public void setPosterPath(String posterPath) {
-        this.posterPath = posterPath;
+    public void setPoster(String poster) {
+        this.poster = poster;
     }
     
     public List<Seance> getSeances() {

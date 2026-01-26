@@ -1,11 +1,13 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plan - ${salle.nom} - NovaCine</title>
+    <link rel="icon" type="image/png" href="${pageContext.request.contextPath}/images/NovaCine.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <style>
@@ -119,6 +121,11 @@
         .siege-vip {
             background-color: #9c27b0;
             color: white;
+        }
+
+        .siege-premium {
+            background-color: #ffc107;
+            color: #0B1D3A;
         }
 
         .siege-handicape {
@@ -255,7 +262,7 @@
                         <select class="form-select" id="newTypeSiege">
                             <option value="">-- Sélectionnez --</option>
                             <c:forEach items="${typesSiege}" var="type">
-                                <option value="${type.idTypeSiege}">${type.nom} (+${type.prixBase} Ar)</option>
+                                <option value="${type.id}">${type.nom}</option>
                             </c:forEach>
                         </select>
                     </div>
@@ -295,19 +302,17 @@
                         </c:choose>
                         
                         <c:set var="siegeClass" value="siege-disponible" />
-                        <c:set var="siegeIcon" value="${siege.numero}" />
+                        <c:set var="siegeLabel" value="${siege.position}" />
                         
                         <c:if test="${siege.statut == 'HORS_SERVICE'}">
                             <c:set var="siegeClass" value="siege-hors-service" />
-                            <c:set var="siegeIcon" value="<i class='bi bi-x'></i>" />
+                            <c:set var="siegeLabel" value="<i class='bi bi-x'></i>" />
                         </c:if>
-                        <c:if test="${siege.typeSiege.nom == 'VIP'}">
+                        <c:if test="${fn:toLowerCase(siege.typeSiege.nom) == 'vip'}">
                             <c:set var="siegeClass" value="siege-vip" />
-                            <c:set var="siegeIcon" value="<i class='bi bi-star-fill'></i>" />
                         </c:if>
-                        <c:if test="${siege.typeSiege.nom == 'HANDICAPE'}">
-                            <c:set var="siegeClass" value="siege-handicape" />
-                            <c:set var="siegeIcon" value="<i class='bi bi-universal-access'></i>" />
+                        <c:if test="${fn:toLowerCase(siege.typeSiege.nom) == 'prenium'}">
+                            <c:set var="siegeClass" value="siege-premium" />
                         </c:if>
                         
                         <div class="siege ${siegeClass}" 
@@ -317,7 +322,7 @@
                              data-type="${siege.typeSiege.nom}"
                              onclick="toggleSiege(this)"
                              title="${siege.position} - ${siege.typeSiege.nom} - ${siege.statut}">
-                            ${siegeIcon}
+                            <c:out value="${siegeLabel}" escapeXml="false" />
                         </div>
                         
                         <c:if test="${status.last}">
@@ -337,8 +342,8 @@
                         <span class="legende-label">VIP</span>
                     </div>
                     <div class="legende-item">
-                        <div class="legende-box siege-handicape"></div>
-                        <span class="legende-label">Handicapé</span>
+                        <div class="legende-box siege-premium"></div>
+                        <span class="legende-label">Prenium</span>
                     </div>
                     <div class="legende-item">
                         <div class="legende-box siege-hors-service"></div>

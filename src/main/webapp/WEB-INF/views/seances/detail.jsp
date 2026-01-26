@@ -19,44 +19,67 @@
         }
         
         body {
-            background-color: white;
+            background-color: #f8f9fa;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         .main-content {
             margin-left: 240px;
             min-height: 100vh;
-            background-color: white;
+            background-color: #f8f9fa;
         }
         
         .page-header {
             background: white;
             border: 1px solid var(--primary-color);
-            border-radius: 4px;
+            border-radius: 8px;
             padding: 1.5rem;
             margin-bottom: 1.5rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
         
         .detail-card {
             background: white;
             border: 1px solid #dee2e6;
-            border-radius: 4px;
-            padding: 2rem;
+            border-radius: 8px;
+            padding: 1.5rem;
             margin-bottom: 1.5rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
         }
         
-        .detail-section {
-            margin-bottom: 2rem;
+        .film-poster {
+            width: 100%;
+            max-width: 280px;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
         
-        .detail-section h5 {
+        .film-poster-placeholder {
+            width: 100%;
+            max-width: 280px;
+            height: 400px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 4rem;
+        }
+        
+        .section-title {
             color: var(--primary-color);
             font-weight: 700;
             margin-bottom: 1rem;
-            border-bottom: 2px solid var(--secondary-color);
             padding-bottom: 0.5rem;
+            border-bottom: 3px solid var(--secondary-color);
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title i {
+            margin-right: 0.5rem;
         }
         
         .info-row {
@@ -72,7 +95,7 @@
         .info-label {
             font-weight: 600;
             color: #495057;
-            min-width: 180px;
+            min-width: 150px;
             display: flex;
             align-items: center;
         }
@@ -87,65 +110,105 @@
             flex: 1;
         }
         
-        .big-stat {
-            text-align: center;
-            padding: 1.5rem;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .status-a-venir {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .status-en-cours {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-terminee {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .tarif-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .tarif-table th {
+            background-color: var(--primary-color);
             color: white;
-            border-radius: 8px;
-            margin-bottom: 1rem;
+            padding: 12px;
+            text-align: center;
+            font-weight: 600;
         }
         
-        .big-stat h2 {
-            font-size: 3rem;
-            font-weight: 700;
-            margin: 0;
+        .tarif-table td {
+            padding: 10px 12px;
+            text-align: center;
+            border-bottom: 1px solid #dee2e6;
         }
         
-        .big-stat p {
-            margin: 0;
-            font-size: 1.1rem;
-            opacity: 0.9;
+        .tarif-table tr:nth-child(even) {
+            background-color: #f8f9fa;
         }
         
-        .progress-custom {
-            height: 30px;
-            border-radius: 15px;
+        .tarif-table tr:hover {
             background-color: #e9ecef;
         }
         
-        .progress-bar-custom {
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .tarif-value {
             font-weight: 600;
-            font-size: 0.9rem;
+            color: #28a745;
         }
         
         .btn-primary-custom {
             background-color: var(--primary-color);
             border-color: var(--primary-color);
             color: white;
+            font-weight: 600;
+            padding: 10px 25px;
         }
         
         .btn-primary-custom:hover {
             background-color: #164a7a;
+            color: white;
         }
         
-        .btn-reserve-big {
-            background: linear-gradient(135deg, var(--secondary-color), #ffb300);
-            border: none;
+        .btn-warning-custom {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
             color: var(--primary-color);
-            font-weight: 700;
-            padding: 15px 40px;
-            font-size: 1.2rem;
-            border-radius: 8px;
-            transition: all 0.3s;
+            font-weight: 600;
+            padding: 10px 25px;
         }
         
-        .btn-reserve-big:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 16px rgba(255, 193, 7, 0.5);
+        .btn-warning-custom:hover {
+            background-color: #e0a800;
+            color: var(--primary-color);
+        }
+        
+        .gain-potentiel-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            border-radius: 8px;
+        }
+        
+        .gain-potentiel-card h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .film-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
         }
     </style>
 </head>
@@ -159,12 +222,22 @@
             <div class="page-header">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h1 class="mb-2"><i class="bi bi-calendar-event me-2"></i>Détails de la Séance</h1>
-                        <p class="mb-0 text-muted">Informations complètes</p>
+                        <h1 class="mb-2">
+                            <i class="bi bi-calendar-event me-2"></i>Détails de la Séance
+                        </h1>
+                        <p class="mb-0 text-muted">
+                            Séance #${seance.idSeance} - ${seance.film.titre}
+                        </p>
                     </div>
-                    <a href="${pageContext.request.contextPath}/seances" class="btn btn-outline-secondary">
-                        <i class="bi bi-arrow-left me-2"></i>Retour
-                    </a>
+                    <div class="d-flex gap-2">
+                        <a href="${pageContext.request.contextPath}/achats/seance/${seance.idSeance}" 
+                           class="btn btn-warning-custom">
+                            <i class="bi bi-ticket-perforated me-2"></i>Acheter Billet
+                        </a>
+                        <a href="${pageContext.request.contextPath}/seances" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-2"></i>Retour
+                        </a>
+                    </div>
                 </div>
             </div>
             
@@ -184,155 +257,200 @@
             </c:if>
             
             <div class="row">
-                <!-- Colonne gauche -->
-                <div class="col-md-8">
-                    <!-- Informations Film -->
-                    <div class="detail-card">
-                        <div class="detail-section">
-                            <h5><i class="bi bi-film me-2"></i>Film</h5>
-                            <div class="info-row">
-                                <div class="info-label"><i class="bi bi-camera-reels"></i>Titre</div>
-                                <div class="info-value"><strong>${seance.film.titre}</strong></div>
-                            </div>
-                            <div class="info-row">
-                                <div class="info-label"><i class="bi bi-hourglass-split"></i>Durée</div>
-                                <div class="info-value">${seance.film.duree} minutes</div>
-                            </div>
-                            <%-- <div class="info-row">
-                                <div class="info-label"><i class="bi bi-shield-check"></i>Classification</div>
-                                <div class="info-value">${seance.film.classification.nom}</div>
-                            </div> --%>
-                            <div class="info-row">
-                                <div class="info-label"><i class="bi bi-cash-coin"></i>Argent générable</div>
-                                <div class="info-value">
-                                    <strong class="text-success">
-                                        <fmt:formatNumber value="${totalargent}" type="number" groupingUsed="true" /> Ar
-                                    </strong>
+                <!-- Colonne gauche: Poster + Infos générales -->
+                <div class="col-lg-4">
+                    <!-- Poster du film -->
+                    <div class="detail-card text-center">
+                        <c:choose>
+                            <c:when test="${not empty seance.film.poster}">
+                                <img src="${pageContext.request.contextPath}/images/films/${seance.film.poster}" 
+                                     alt="${seance.film.titre}" 
+                                     class="film-poster"
+                                     onerror="this.outerHTML='<div class=\'film-poster-placeholder\'><i class=\'bi bi-film\'></i></div>'">
+                            </c:when>
+                            <c:otherwise>
+                                <div class="film-poster-placeholder">
+                                    <i class="bi bi-film"></i>
                                 </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Informations Séance -->
-                        <div class="detail-section">
-                            <h5><i class="bi bi-calendar-check me-2"></i>Programmation</h5>
-                            <div class="info-row">
-                                <div class="info-label"><i class="bi bi-calendar3"></i>Date</div>
-                                <div class="info-value">
-                                    ${seance.daty}
-                                </div>
-                            </div>
-                            <div class="info-row">
-                                <div class="info-label"><i class="bi bi-clock"></i>Horaires</div>
-                                <div class="info-value">
-                                    ${seance.heure}
-                                </div>
-                            </div>
-                            <div class="info-row">
-                                <div class="info-label"><i class="bi bi-door-open"></i>Salle</div>
-                                <div class="info-value">
-                                    ${seance.salle.nom} 
-                                    <small class="text-muted">(${seance.salle.capacite} places)</small>
-                                </div>
-                            </div>
-                            <div class="info-row">
-                                <div class="info-label"><i class="bi bi-info-circle"></i>Statut</div>
-                                <div class="info-value">
-                                    <c:choose>
-                                        <c:when test="${seance.statut == 'PROGRAMMEE'}">
-                                            <span class="badge bg-success">Programmée</span>
-                                        </c:when>
-                                        <c:when test="${seance.statut == 'EN_COURS'}">
-                                            <span class="badge bg-info">En Cours</span>
-                                        </c:when>
-                                        <c:when test="${seance.statut == 'TERMINEE'}">
-                                            <span class="badge bg-secondary">Terminée</span>
-                                        </c:when>
-                                        <c:when test="${seance.statut == 'ANNULEE'}">
-                                            <span class="badge bg-danger">Annulée</span>
-                                        </c:when>
-                                    </c:choose>
-                                </div>
-                            </div>
-                        </div>
+                            </c:otherwise>
+                        </c:choose>
+                        <h3 class="mt-3 film-title">${seance.film.titre}</h3>
+                    </div>
+                    
+                    <!-- Statut -->
+                    <div class="detail-card text-center">
+                        <h5 class="section-title justify-content-center">
+                            <i class="bi bi-info-circle"></i>Statut
+                        </h5>
+                        <c:choose>
+                            <c:when test="${statut == 'A_VENIR'}">
+                                <span class="status-badge status-a-venir">
+                                    <i class="bi bi-clock me-2"></i>À venir
+                                </span>
+                            </c:when>
+                            <c:when test="${statut == 'EN_COURS'}">
+                                <span class="status-badge status-en-cours">
+                                    <i class="bi bi-play-circle me-2"></i>En cours
+                                </span>
+                            </c:when>
+                            <c:otherwise>
+                                <span class="status-badge status-terminee">
+                                    <i class="bi bi-check-circle me-2"></i>Terminée
+                                </span>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
+                    
+                    <!-- Gain Potentiel (à implémenter plus tard) -->
+                    <div class="gain-potentiel-card">
+                        <p class="mb-1"><i class="bi bi-cash-coin me-2"></i>Gain Potentiel</p>
+                        <h2><fmt:formatNumber value="${gainsPotentiel}" type="number" groupingUsed="true" /> MGA</h2>
+                        <small class="opacity-75">Par defaut : par rapport au tarif "Adulte"</small>
+                        </small>
                     </div>
                 </div>
                 
-                <!-- Colonne droite -->
-                <div class="col-md-4">
-                    <!-- Disponibilité -->
-                    <div class="big-stat">
-                        <h2>${seance.placesDisponibles}</h2>
-                        <p>Places Disponibles</p>
-                    </div>
-                    
+                <!-- Colonne droite: Détails -->
+                <div class="col-lg-8">
+                    <!-- Informations de la séance -->
                     <div class="detail-card">
-                        <h6 class="text-center mb-3">Occupation</h6>
-                        <div class="progress progress-custom mb-3">
-                            <c:set var="tauxRemplissage" value="${seance.tauxRemplissage}" />
-                            <c:choose>
-                                <c:when test="${tauxRemplissage < 50}">
-                                    <div class="progress-bar bg-success progress-bar-custom" 
-                                         style="width: ${tauxRemplissage}%">
-                                        ${tauxRemplissage}%
+                        <h5 class="section-title">
+                            <i class="bi bi-calendar-check"></i>Informations de la Séance
+                        </h5>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="info-row">
+                                    <div class="info-label">
+                                        <i class="bi bi-door-open"></i>Salle
                                     </div>
-                                </c:when>
-                                <c:when test="${tauxRemplissage < 85}">
-                                    <div class="progress-bar bg-warning progress-bar-custom" 
-                                         style="width: ${tauxRemplissage}%">
-                                        ${tauxRemplissage}%
+                                    <div class="info-value">
+                                        <strong>${seance.salle.nom}</strong>
+                                        <small class="text-muted">(${seance.salle.capacite} places)</small>
                                     </div>
-                                </c:when>
-                                <c:otherwise>
-                                    <div class="progress-bar bg-danger progress-bar-custom" 
-                                         style="width: ${tauxRemplissage}%">
-                                        ${tauxRemplissage}%
+                                </div>
+                                
+                                <div class="info-row">
+                                    <div class="info-label">
+                                        <i class="bi bi-calendar3"></i>Date
                                     </div>
-                                </c:otherwise>
-                            </c:choose>
+                                    <div class="info-value">
+                                        <strong>${seance.dateSeance}</strong>
+                                    </div>
+                                </div>
+                                
+                                <div class="info-row">
+                                    <div class="info-label">
+                                        <i class="bi bi-hourglass-split"></i>Durée film
+                                    </div>
+                                    <div class="info-value">${seance.film.duree} minutes</div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="info-row">
+                                    <div class="info-label">
+                                        <i class="bi bi-clock"></i>Début
+                                    </div>
+                                    <div class="info-value">
+                                        <strong class="text-success">${seance.heureSeance}</strong>
+                                    </div>
+                                </div>
+                                
+                                <div class="info-row">
+                                    <div class="info-label">
+                                        <i class="bi bi-clock-history"></i>Fin estimée
+                                    </div>
+                                    <div class="info-value">
+                                        <strong class="text-danger">${heureFin}</strong>
+                                        <small class="text-muted">(+15 min nettoyage)</small>
+                                    </div>
+                                </div>
+                                
+                                <div class="info-row">
+                                    <div class="info-label">
+                                        <i class="bi bi-calendar-plus"></i>Créée le
+                                    </div>
+                                    <div class="info-value">
+                                        ${seance.dtCreation}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
+                    <!-- Tableau des Tarifs -->
+                    <div class="detail-card">
+                        <h5 class="section-title">
+                            <i class="bi bi-currency-exchange"></i>Grille Tarifaire
+                        </h5>
+                        
+                        <c:choose>
+                            <c:when test="${not empty typePlaces and not empty typeClients}">
+                                <div class="table-responsive">
+                                    <table class="tarif-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Type de Place</th>
+                                                <c:forEach var="typeClient" items="${typeClients}">
+                                                    <th>${typeClient.nom}</th>
+                                                </c:forEach>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <c:forEach var="typePlace" items="${typePlaces}">
+                                                <tr>
+                                                    <td><strong>${typePlace.nom}</strong></td>
+                                                    <c:forEach var="typeClient" items="${typeClients}">
+                                                        <td>
+                                                            <c:set var="prix" value="${tarifMap[typePlace.id][typeClient.idTypeClient]}" />
+                                                            <c:choose>
+                                                                <c:when test="${not empty prix}">
+                                                                    <span class="tarif-value">
+                                                                        <fmt:formatNumber value="${prix}" type="number" groupingUsed="true" /> Ar
+                                                                    </span>
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    <span class="text-muted">--</span>
+                                                                </c:otherwise>
+                                                            </c:choose>
+                                                        </td>
+                                                    </c:forEach>
+                                                </tr>
+                                            </c:forEach>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </c:when>
+                            <c:otherwise>
+                                <div class="alert alert-info mb-0">
+                                    <i class="bi bi-info-circle me-2"></i>
+                                    Aucun tarif défini pour cette séance.
+                                </div>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
+                    
                     <!-- Actions -->
-                    <div class="d-grid gap-2">
-                        <c:if test="${seance.disponible and not seance.complet}">
-                            <a href="${pageContext.request.contextPath}/ventes/seance/${seance.idSeance}/reserver" 
-                               class="btn btn-reserve-big">
-                                <i class="bi bi-ticket-perforated me-2"></i>Réserver
+                    <div class="detail-card">
+                        <h5 class="section-title">
+                            <i class="bi bi-lightning"></i>Actions
+                        </h5>
+                        
+                        <div class="d-flex gap-2 flex-wrap">
+                            <a href="${pageContext.request.contextPath}/achats/seance/${seance.idSeance}" 
+                               class="btn btn-warning-custom">
+                                <i class="bi bi-ticket-perforated me-2"></i>Acheter un Billet
                             </a>
-                        </c:if>
-                        
-                        <c:if test="${seance.complet}">
-                            <button class="btn btn-danger btn-lg" disabled>
-                                <i class="bi bi-x-circle me-2"></i>Complet
-                            </button>
-                        </c:if>
-                        
-                        <c:if test="${userDetail.admin or userDetail.manager}">
+                            <a href="${pageContext.request.contextPath}/seances/${seance.idSeance}/ventes" 
+                               class="btn btn-primary-custom">
+                                <i class="bi bi-cash-stack me-2"></i>Voir les Ventes
+                            </a>
                             <a href="${pageContext.request.contextPath}/seances/${seance.idSeance}/modifier" 
-                               class="btn btn-outline-primary">
+                               class="btn btn-outline-secondary">
                                 <i class="bi bi-pencil me-2"></i>Modifier
                             </a>
-                            
-                            <c:if test="${seance.placesVendues == 0}">
-                                <form action="${pageContext.request.contextPath}/seances/${seance.idSeance}/annuler" 
-                                      method="post"
-                                      onsubmit="return confirm('Confirmer l\'annulation ?');">
-                                    <button type="submit" class="btn btn-outline-danger w-100">
-                                        <i class="bi bi-x-circle me-2"></i>Annuler la séance
-                                    </button>
-                                </form>
-                            </c:if>
-                            
-                            <c:if test="${userDetail.admin}">
-                                <form action="${pageContext.request.contextPath}/seances/${seance.idSeance}/supprimer" 
-                                      method="post"
-                                      onsubmit="return confirm('ATTENTION: Supprimer définitivement ?');">
-                                    <button type="submit" class="btn btn-outline-dark w-100">
-                                        <i class="bi bi-trash me-2"></i>Supprimer
-                                    </button>
-                                </form>
-                            </c:if>
-                        </c:if>
+                        </div>
                     </div>
                 </div>
             </div>

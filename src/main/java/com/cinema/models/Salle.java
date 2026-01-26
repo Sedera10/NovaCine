@@ -19,17 +19,8 @@ public class Salle {
     @Column(name = "capacite", nullable = false)
     private Integer capacite;
     
-    @Column(name = "nb_rangee", nullable = false)
-    private Integer nbRangee;
-    
-    @Column(name = "nb_colonne", nullable = false)
-    private Integer nbColonne;
-    
     @Column(name = "dt_creation", nullable = false)
     private LocalDateTime dtCreation;
-    
-    @OneToMany(mappedBy = "salle", cascade = CascadeType.ALL)
-    private List<Place> places;
     
     @OneToMany(mappedBy = "salle")
     private List<Seance> seances;
@@ -39,11 +30,9 @@ public class Salle {
         this.dtCreation = LocalDateTime.now();
     }
 
-    public Salle(String nom, Integer capacite, Integer nbRangee, Integer nbColonne) {
+    public Salle(String nom, Integer capacite) {
         this.nom = nom;
         this.capacite = capacite;
-        this.nbRangee = nbRangee;
-        this.nbColonne = nbColonne;
         this.dtCreation = LocalDateTime.now();
     }
 
@@ -72,36 +61,12 @@ public class Salle {
         this.capacite = capacite;
     }
     
-    public Integer getNbRangee() {
-        return nbRangee;
-    }
-    
-    public void setNbRangee(Integer nbRangee) {
-        this.nbRangee = nbRangee;
-    }
-    
-    public Integer getNbColonne() {
-        return nbColonne;
-    }
-    
-    public void setNbColonne(Integer nbColonne) {
-        this.nbColonne = nbColonne;
-    }
-    
     public LocalDateTime getDtCreation() {
         return dtCreation;
     }
     
     public void setDtCreation(LocalDateTime dtCreation) {
         this.dtCreation = dtCreation;
-    }
-    
-    public List<Place> getPlaces() {
-        return places;
-    }
-    
-    public void setPlaces(List<Place> places) {
-        this.places = places;
     }
     
     public List<Seance> getSeances() {

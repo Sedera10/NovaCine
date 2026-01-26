@@ -6,6 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${action == 'edit' ? 'Modifier' : 'Nouvelle'} Salle - NovaCine</title>
+    <link rel="icon" type="image/png" href="${pageContext.request.contextPath}/images/NovaCine.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <style>
@@ -121,14 +122,8 @@
 
             <!-- Formulaire -->
             <div class="form-container">
-                <c:if test="${action != 'edit'}">
-                    <div class="info-box">
-                        <i class="bi bi-info-circle"></i>
-                        <strong>Information:</strong> Les sièges seront générés automatiquement lors de la création de la salle.
-                    </div>
-                </c:if>
-
-                <form method="post" action="${pageContext.request.contextPath}/salles/nouveau">
+                <c:set var="formAction" value="${action == 'edit' ? pageContext.request.contextPath.concat('/salles/').concat(salle.idSalle).concat('/modifier') : pageContext.request.contextPath.concat('/salles/nouveau')}" />
+                <form method="post" action="${formAction}">
                     <input type="hidden" name="action" value="${action}">
                     
                     <c:if test="${action == 'edit'}">
@@ -146,104 +141,55 @@
                                    placeholder="Ex: Salle Premium 1">
                         </div>
 
-                        <c:choose>
-                            <c:when test="${action == 'edit'}">
-                                <!-- En mode édition: nb_rangees et nb_colonnes en lecture seule -->
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label">
-                                        <i class="bi bi-grid-3x3"></i> Nombre de Rangées
-                                    </label>
-                                    <input type="number" class="form-control" 
-                                           value="${salle.nbRangees}" disabled>
-                                    <small class="text-muted">Non modifiable après création</small>
-                                </div>
+                        <!-- Capacité (directe) -->
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">
+                                <i class="bi bi-people-fill"></i> Capacité <span class="required">*</span>
+                            </label>
+                            <input type="number" class="form-control" name="capacite" id="capaciteInput"
+                                   value="${salle.capacite}" min="1" required
+                                   placeholder="Nombre total de places">
+                            <small class="text-muted">Entrez la capacité totale de la salle</small>
+                        </div>
 
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label">
-                                        <i class="bi bi-grid-3x3"></i> Nombre de Colonnes
-                                    </label>
-                                    <input type="number" class="form-control" 
-                                           value="${salle.nbColonnes}" disabled>
-                                    <small class="text-muted">Non modifiable après création</small>
-                                </div>
+                        <!-- Configuration des types de places -->
+                        <div class="col-md-12 mb-3">
+                            <hr class="my-4">
+                            <h5 class="mb-3">
+                                <i class="bi bi-gear"></i> Configuration des Types de Places
+                            </h5>
+                            <div class="info-box">
+                                <i class="bi bi-info-circle"></i>
+                                <strong>Important:</strong> La somme des places par type doit égaler la capacité totale.
+                            </div>
+                        </div>
 
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label">
-                                        <i class="bi bi-people-fill"></i> Capacité Totale
-                                    </label>
-                                    <input type="number" class="form-control" 
-                                           value="${salle.capaciteTotale}" disabled>
-                                </div>
-                            </c:when>
-                            <c:otherwise>
-                                <!-- En mode création: champs modifiables -->
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label">
-                                        <i class="bi bi-grid-3x3"></i> Nombre de Rangées <span class="required">*</span>
-                                    </label>
-                                    <input type="number" class="form-control" name="nbRangees" 
-                                           value="${salle.nbRangees}" min="1" max="26" required
-                                           placeholder="Ex: 10">
-                                    <small class="text-muted">Maximum 26 rangées (A-Z)</small>
-                                </div>
+                        <c:forEach var="typePlace" items="${typesPlaces}">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    <i class="bi bi-tag-fill"></i> ${typePlace.nom}
+                                </label>
+                                <!-- Hidden id for controller binding as List<Long> idTypePlaces -->
+                                <input type="hidden" name="idTypePlaces" value="${typePlace.id}">
 
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label">
-                                        <i class="bi bi-grid-3x3"></i> Nombre de Colonnes <span class="required">*</span>
-                                    </label>
-                                    <input type="number" class="form-control" name="nbColonnes" 
-                                           value="${salle.nbColonnes}" min="1" max="50" required
-                                           placeholder="Ex: 15">
-                                    <small class="text-muted">Maximum 50 colonnes</small>
-                                </div>
+                                <!-- number input bound to List<Integer> nombres -->
+                                <input type="number" 
+                                       class="form-control config-place" 
+                                       name="nombres" 
+                                       min="0" 
+                                       value="${salleConfigMap[typePlace.id] != null ? salleConfigMap[typePlace.id] : 0}"
+                                       placeholder="Nombre de places">
+                                <small class="text-muted">Nombre de places de type ${typePlace.nom}</small>
+                            </div>
+                        </c:forEach>
 
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label">
-                                        <i class="bi bi-people-fill"></i> Capacité Totale
-                                    </label>
-                                    <input type="text" class="form-control" id="capaciteCalculee"
-                                           value="0" disabled>
-                                    <!-- Champ hidden pour envoyer la valeur au serveur -->
-                                    <input type="hidden" name="capacite" id="capaciteHidden" value="0">
-                                    <small class="text-muted">Calculé automatiquement</small>
-                                </div>
-                                
-                                <!-- Configuration des types de places -->
-                                <div class="col-md-12 mb-3">
-                                    <hr class="my-4">
-                                    <h5 class="mb-3">
-                                        <i class="bi bi-gear"></i> Configuration des Types de Places
-                                    </h5>
-                                    <div class="info-box">
-                                        <i class="bi bi-info-circle"></i>
-                                        <strong>Important:</strong> La somme des places par type doit égaler la capacité totale.
-                                    </div>
-                                </div>
-                                
-                                <c:forEach var="typePlace" items="${typesPlaces}">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">
-                                            <i class="bi bi-tag-fill"></i> ${typePlace.nom} (${typePlace.prix} Ar)
-                                        </label>
-                                        <input type="number" 
-                                               class="form-control config-place" 
-                                               name="typePlace_${typePlace.id_type_place}" 
-                                               min="0" 
-                                               value="0"
-                                               placeholder="Nombre de places">
-                                        <small class="text-muted">Nombre de places de type ${typePlace.nom}</small>
-                                    </div>
-                                </c:forEach>
-                                
-                                <div class="col-md-12 mb-3">
-                                    <div class="alert alert-info" id="validationInfo">
-                                        <i class="bi bi-calculator"></i> 
-                                        <strong>Total configuré:</strong> <span id="totalConfig">0</span> places
-                                        <span id="validationMessage"></span>
-                                    </div>
-                                </div>
-                            </c:otherwise>
-                        </c:choose>
+                        <div class="col-md-12 mb-3">
+                            <div class="alert alert-info" id="validationInfo">
+                                <i class="bi bi-calculator"></i> 
+                                <strong>Total configuré:</strong> <span id="totalConfig">0</span> places
+                                <span id="validationMessage"></span>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Boutons -->
@@ -263,74 +209,51 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Calculer automatiquement la capacité totale lors de la saisie
-        const nbRangeesInput = document.querySelector('input[name="nbRangees"]');
-        const nbColonnesInput = document.querySelector('input[name="nbColonnes"]');
-        const capaciteField = document.getElementById('capaciteCalculee');
-        const capaciteHidden = document.getElementById('capaciteHidden');
+        // Validation : compare la somme des nombres par type avec la capacité donnée
+        const capaciteInput = document.getElementById('capaciteInput');
         const configInputs = document.querySelectorAll('.config-place');
         const totalConfigSpan = document.getElementById('totalConfig');
         const validationMessage = document.getElementById('validationMessage');
         const validationInfo = document.getElementById('validationInfo');
         const submitButton = document.querySelector('button[type="submit"]');
 
-        if (nbRangeesInput && nbColonnesInput && capaciteField) {
-            function updateCapacite() {
-                const rangees = parseInt(nbRangeesInput.value) || 0;
-                const colonnes = parseInt(nbColonnesInput.value) || 0;
-                const total = rangees * colonnes;
-                
-                capaciteField.value = total + ' places';
-                
-                // Mettre à jour le champ hidden avec la valeur numérique
-                if (capaciteHidden) {
-                    capaciteHidden.value = total;
-                }
-                
-                validateConfiguration();
-            }
+        function validateConfiguration() {
+            const capaciteTotal = parseInt(capaciteInput.value) || 0;
+            let totalConfig = 0;
 
-            nbRangeesInput.addEventListener('input', updateCapacite);
-            nbColonnesInput.addEventListener('input', updateCapacite);
-            
-            // Validation de la configuration des types de places
-            function validateConfiguration() {
-                const capaciteTotal = parseInt(capaciteHidden.value) || 0;
-                let totalConfig = 0;
-                
-                configInputs.forEach(input => {
-                    totalConfig += parseInt(input.value) || 0;
-                });
-                
-                totalConfigSpan.textContent = totalConfig;
-                
-                if (capaciteTotal === 0) {
-                    validationMessage.innerHTML = ' <i class="bi bi-arrow-left"></i> Veuillez d\'abord définir le nombre de rangées et colonnes';
-                    validationInfo.className = 'alert alert-warning';
-                    if (submitButton) submitButton.disabled = true;
-                } else if (totalConfig === 0) {
-                    validationMessage.innerHTML = ' <i class="bi bi-exclamation-triangle"></i> Veuillez configurer les types de places';
-                    validationInfo.className = 'alert alert-warning';
-                    if (submitButton) submitButton.disabled = true;
-                } else if (totalConfig === capaciteTotal) {
-                    validationMessage.innerHTML = ' <i class="bi bi-check-circle-fill text-success"></i> Configuration valide !';
-                    validationInfo.className = 'alert alert-success';
-                    if (submitButton) submitButton.disabled = false;
-                } else {
-                    validationMessage.innerHTML = ' <i class="bi bi-x-circle-fill text-danger"></i> La somme (' + totalConfig + ') doit égaler la capacité totale (' + capaciteTotal + ')';
-                    validationInfo.className = 'alert alert-danger';
-                    if (submitButton) submitButton.disabled = true;
-                }
-            }
-            
-            // Écouter les changements sur les inputs de configuration
             configInputs.forEach(input => {
-                input.addEventListener('input', validateConfiguration);
+                totalConfig += parseInt(input.value) || 0;
             });
-            
-            // Calculer au chargement si valeurs présentes
-            updateCapacite();
+
+            totalConfigSpan.textContent = totalConfig;
+
+            if (capaciteTotal === 0) {
+                validationMessage.innerHTML = ' <i class="bi bi-exclamation-triangle"></i> Veuillez définir la capacité de la salle';
+                validationInfo.className = 'alert alert-warning';
+                if (submitButton) submitButton.disabled = true;
+            } else if (totalConfig === 0) {
+                validationMessage.innerHTML = ' <i class="bi bi-exclamation-triangle"></i> Veuillez configurer les types de places';
+                validationInfo.className = 'alert alert-warning';
+                if (submitButton) submitButton.disabled = true;
+            } else if (totalConfig === capaciteTotal) {
+                validationMessage.innerHTML = ' <i class="bi bi-check-circle-fill text-success"></i> Configuration valide !';
+                validationInfo.className = 'alert alert-success';
+                if (submitButton) submitButton.disabled = false;
+            } else {
+                validationMessage.innerHTML = ' <i class="bi bi-x-circle-fill text-danger"></i> La somme (' + totalConfig + ') doit égaler la capacité totale (' + capaciteTotal + ')';
+                validationInfo.className = 'alert alert-danger';
+                if (submitButton) submitButton.disabled = true;
+            }
         }
+
+        // Écouter les changements
+        if (capaciteInput) {
+            capaciteInput.addEventListener('input', validateConfiguration);
+        }
+        configInputs.forEach(input => input.addEventListener('input', validateConfiguration));
+
+        // Calculer au chargement
+        validateConfiguration();
     </script>
 </body>
 </html>

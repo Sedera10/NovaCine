@@ -178,6 +178,24 @@
             background-color: var(--primary-color);
             color: white;
         }
+        
+        .badge-paye {
+            background-color: #28a745;
+        }
+        
+        .badge-encours {
+            background-color: #ffc107;
+            color: #000;
+        }
+        
+        .badge-annule {
+            background-color: #dc3545;
+        }
+        
+        .lignes-details {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
     </style>
 </head>
 <body>
@@ -186,16 +204,24 @@
     <div class="main-content">
         <div class="container-fluid p-4">
             <div class="page-header">
-                <h1><i class="bi bi-receipt"></i> Ventes de la Séance</h1>
+                <div class="d-flex justify-content-between align-items-center">
+                    <h1><i class="bi bi-receipt me-2"></i>Ventes de la Séance</h1>
+                    <a href="${pageContext.request.contextPath}/seances/${seance.idSeance}" class="btn btn-secondary-custom">
+                        <i class="bi bi-arrow-left me-1"></i>Retour à la séance
+                    </a>
+                </div>
             </div>
         
             <!-- Infos séance -->
             <div class="stats-card">
-                <h3><i class="bi bi-film"></i> ${seance.film.titre}</h3>
+                <h3><i class="bi bi-film me-2"></i>${seance.film.titre}</h3>
                 <p>
-                    <strong>Date:</strong> ${seance.daty} |
-                    <strong>Heure:</strong> ${seance.heure} |
-                    <strong>Salle:</strong> ${seance.salle.nom}
+                    <strong>Date:</strong> 
+                    <fmt:parseDate value="${seance.dateSeance}" pattern="yyyy-MM-dd" var="parsedDate" type="date"/>
+                    <fmt:formatDate value="${parsedDate}" pattern="EEEE dd MMMM yyyy"/> |
+                    <strong>Heure:</strong> ${seance.heureSeance} |
+                    <strong>Salle:</strong> 
+                    <a href="${pageContext.request.contextPath}/salles/${seance.salle.idSalle}">${seance.salle.nom}</a>
                 </p>
             </div>
         
@@ -222,52 +248,89 @@
             </div>
         
             <!-- Liste des ventes -->
-            <h3 class="section-title"><i class="bi bi-list-ul"></i> Liste des Ventes</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Date/Heure</th>
-                        <th>Acheteur</th>
-                        <th>Places</th>
-                        <th>Nb Billets</th>
-                        <th>Montant</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <c:forEach items="${achats}" var="achat">
-                        <tr>
-                            <td>#${achat.idAchat}</td>
-                            <td>
-                                ${achat.dtAchat}
-                            </td>
-                            <td>${achat.nomAcheteur}</td>
-                            <td>
-                                <c:forEach items="${achat.billets}" var="billet" varStatus="status">
-                                    ${billet.place.codePlace}<c:if test="${not status.last}">, </c:if>
-                                </c:forEach>
-                            </td>
-                            <td>${achat.billets.size()}</td>
-                            <td><strong>${achat.total} Ar</strong></td>
-                        </tr>
-                    </c:forEach>
-                </tbody>
-            </table>
-        
-            <c:if test="${empty achats}">
-                <div style="background: white; border: 1px solid #dee2e6; padding: 1rem; border-radius: 4px; color: #6c757d;">
-                    <i class="bi bi-info-circle"></i> Aucune vente enregistrée pour cette séance.
-                </div>
-            </c:if>
+            <h3 class="section-title"><i class="bi bi-list-ul me-2"></i>Liste des Ventes (${achats.size()})</h3>
+            
+            <c:choose>
+                <c:when test="${empty achats}">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>Aucune vente enregistrée pour cette séance.
+                    </div>
+                </c:when>
+                <c:otherwise>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Date/Heure</th>
+                                <th>Client</th>
+                                <th>Détail</th>
+                                <th>Nb Billets</th>
+                                <th>Montant</th>
+                                <th>Statut</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <c:forEach items="${achats}" var="achat">
+                                <tr>
+                                    <td><strong>#${achat.idAchat}</strong></td>
+                                    <td>
+                                        <fmt:parseDate value="${achat.dtAchat}" pattern="yyyy-MM-dd'T'HH:mm" var="parsedDt" type="both"/>
+                                        <fmt:formatDate value="${parsedDt}" pattern="dd/MM/yyyy HH:mm"/>
+                                    </td>
+                                    <td>${empty achat.nomClient ? 'Anonyme' : achat.nomClient}</td>
+                                    <td class="lignes-details">
+                                        <c:forEach items="${achat.lignes}" var="ligne" varStatus="status">
+                                            ${ligne.quantite}x ${ligne.typePlace.nom} (${ligne.typeClient.nom})<c:if test="${!status.last}"><br/></c:if>
+                                        </c:forEach>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary">${nbBilletsAchats[achat.idAchat]}</span>
+                                    </td>
+                                    <td>
+                                        <strong>
+                                            <fmt:formatNumber value="${totauxAchats[achat.idAchat]}" pattern="#,##0"/> Ar
+                                        </strong>
+                                    </td>
+                                    <td>
+                                        <c:choose>
+                                            <c:when test="${achat.statut == 'PAYE'}">
+                                                <span class="badge badge-paye">Payé</span>
+                                            </c:when>
+                                            <c:when test="${achat.statut == 'EN_COURS'}">
+                                                <span class="badge badge-encours">En cours</span>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <span class="badge badge-annule">Annulé</span>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </td>
+                                    <td>
+                                        <a href="${pageContext.request.contextPath}/achats/${achat.idAchat}" 
+                                           class="btn btn-sm btn-outline-primary" title="Voir détails">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </c:forEach>
+                        </tbody>
+                    </table>
+                </c:otherwise>
+            </c:choose>
         
             <!-- Total des ventes -->
             <div class="total-ventes">
-                <i class="bi bi-cash-stack"></i> TOTAL DES VENTES: ${totalVentes} Ar
+                <i class="bi bi-cash-stack me-2"></i>TOTAL DES VENTES: 
+                <fmt:formatNumber value="${totalVentes}" pattern="#,##0"/> Ar
             </div>
         
             <div class="text-center" style="margin-top: 2rem;">
-                <a href="<c:url value='/seances'/>" class="btn-primary-custom"><i class="bi bi-arrow-left"></i> Retour aux séances</a>
-                <a href="<c:url value='/achats/liste'/>" class="btn-secondary-custom"><i class="bi bi-receipt-cutoff"></i> Toutes les ventes</a>
+                <a href="${pageContext.request.contextPath}/seances/${seance.idSeance}" class="btn-primary-custom me-2">
+                    <i class="bi bi-arrow-left me-1"></i>Retour à la séance
+                </a>
+                <a href="${pageContext.request.contextPath}/achats/nouveau" class="btn-secondary-custom">
+                    <i class="bi bi-plus-circle me-1"></i>Nouvelle vente
+                </a>
             </div>
         </div>
     </div>

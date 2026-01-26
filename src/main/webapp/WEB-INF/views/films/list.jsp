@@ -174,11 +174,10 @@
                         <h1 class="mb-2"><i class="bi bi-film me-2"></i>Gestion des Films</h1>
                         <p class="mb-0 opacity-75">Catalogue complet des films</p>
                     </div>
-                    <c:if test="${user.role.nomRole eq 'Admin' or user.role.nomRole eq 'Manager'}">
                         <a href="${pageContext.request.contextPath}/films/nouveau" class="btn btn-secondary-custom btn-lg">
                             <i class="bi bi-plus-circle me-2"></i>Nouveau Film
                         </a>
-                    </c:if>
+              
                 </div>
             </div>
             
@@ -272,8 +271,8 @@
                                 <div class="film-card">
                                     <!-- Poster -->
                                     <c:choose>
-                                        <c:when test="${not empty film.posterPath}">
-                                            <img src="<c:url value='/images/films/${film.posterPath}'/>" 
+                                        <c:when test="${not empty film.poster}">
+                                            <img src="<c:url value='/images/films/${film.poster}'/>" 
                                                  alt="${film.titre}" class="film-poster" 
                                                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                                             <div class="film-poster" style="display: none;">

@@ -7,6 +7,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Liste des Salles - NovaCine</title>
+    <link rel="icon" type="image/png" href="${pageContext.request.contextPath}/images/NovaCine.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <style>
@@ -257,10 +258,7 @@
                                         <i class="bi bi-people-fill"></i>
                                         Capacité: <strong>${salle.capacite} places</strong>
                                     </div>
-                                    <div class="salle-info">
-                                        <i class="bi bi-grid-3x3"></i>
-                                        Configuration: <strong>${salle.nbRangee} rangées × ${salle.nbColonne} colonnes</strong>
-                                    </div>
+                                    
                                     <div class="salle-info">
                                         <i class="bi bi-calendar-event"></i>
                                         Créée le: <strong><c:out value="${salle.dtCreation.toLocalDate()}" /></strong>

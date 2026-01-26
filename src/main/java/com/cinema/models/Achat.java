@@ -18,44 +18,51 @@ public class Achat {
     @Column(name = "dt_achat", nullable = false)
     private LocalDateTime dtAchat;
     
-    @Column(name = "nom_acheteur", length = 100)
-    private String nomAcheteur;
+    @Column(name = "montant_total", nullable = true, precision = 15, scale = 2)
+    private BigDecimal montantTotal;
     
-    @Column(name = "total", nullable = false, precision = 10, scale = 2)
-    private BigDecimal total;
+    @Column(name = "statut", nullable = false, length = 20)
+    private String statut = "EN_COURS"; // EN_COURS | PAYE | ANNULE
     
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(
-        name = "achat_billets",
-        joinColumns = @JoinColumn(name = "id_achat"),
-        inverseJoinColumns = @JoinColumn(name = "id_billet")
-    )
-    private List<Billet> billets = new ArrayList<>();
+    @Column(name = "nom_client", length = 100)
+    private String nomClient;
+    
+    @ManyToOne
+    @JoinColumn(name = "id_seance", nullable = false)
+    private Seance seance;
+    
+    @OneToMany(mappedBy = "achat", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AchatLigne> lignes = new ArrayList<>();
 
     // Constructeurs
     public Achat() {
         this.dtAchat = LocalDateTime.now();
-        this.total = BigDecimal.ZERO;
+        this.montantTotal = BigDecimal.ZERO;
+        this.statut = "EN_COURS";
     }
 
-    public Achat(String nomAcheteur, BigDecimal total) {
-        this.nomAcheteur = nomAcheteur;
-        this.total = total;
+    public Achat(Seance seance, String nomClient) {
+        this.seance = seance;
+        this.nomClient = nomClient;
         this.dtAchat = LocalDateTime.now();
+        this.montantTotal = BigDecimal.ZERO;
+        this.statut = "EN_COURS";
     }
 
     // Méthodes utiles
-    public void addBillet(Billet billet) {
-        this.billets.add(billet);
+    public void addLigne(AchatLigne ligne) {
+        this.lignes.add(ligne);
+        ligne.setAchat(this);
     }
 
-    public void removeBillet(Billet billet) {
-        this.billets.remove(billet);
+    public void removeLigne(AchatLigne ligne) {
+        this.lignes.remove(ligne);
+        ligne.setAchat(null);
     }
 
     public void calculerTotal() {
-        this.total = billets.stream()
-            .map(Billet::getPrix)
+        this.montantTotal = lignes.stream()
+            .map(ligne -> ligne.getPrixUnitaire().multiply(new BigDecimal(ligne.getQuantite())))
             .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
@@ -76,27 +83,43 @@ public class Achat {
         this.dtAchat = dtAchat;
     }
 
-    public String getNomAcheteur() {
-        return nomAcheteur;
+    public BigDecimal getMontantTotal() {
+        return montantTotal;
     }
 
-    public void setNomAcheteur(String nomAcheteur) {
-        this.nomAcheteur = nomAcheteur;
+    public void setMontantTotal(BigDecimal montantTotal) {
+        this.montantTotal = montantTotal;
     }
 
-    public BigDecimal getTotal() {
-        return total;
+    public String getStatut() {
+        return statut;
     }
 
-    public void setTotal(BigDecimal total) {
-        this.total = total;
+    public void setStatut(String statut) {
+        this.statut = statut;
     }
 
-    public List<Billet> getBillets() {
-        return billets;
+    public String getNomClient() {
+        return nomClient;
     }
 
-    public void setBillets(List<Billet> billets) {
-        this.billets = billets;
+    public void setNomClient(String nomClient) {
+        this.nomClient = nomClient;
+    }
+
+    public Seance getSeance() {
+        return seance;
+    }
+
+    public void setSeance(Seance seance) {
+        this.seance = seance;
+    }
+
+    public List<AchatLigne> getLignes() {
+        return lignes;
+    }
+
+    public void setLignes(List<AchatLigne> lignes) {
+        this.lignes = lignes;
     }
 }

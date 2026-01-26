@@ -172,8 +172,8 @@
                 <div class="row align-items-center">
                     <div class="col-auto">
                         <c:choose>
-                            <c:when test="${not empty film.posterPath}">
-                                <img src="<c:url value='/images/films/${film.posterPath}'/>"
+                            <c:when test="${not empty film.poster}">
+                                <img src="<c:url value='/images/films/${film.poster}'/>"
                                      alt="${film.titre}" class="film-poster-large" 
                                      onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                                 <div class="film-poster-large" style="display: none;">
@@ -243,37 +243,7 @@
                     </div>
                     
                     <!-- Acteurs -->
-                    <c:if test="${not empty film.acteurs}">
-                        <div class="info-card">
-                            <h3 class="section-title"><i class="bi bi-people me-2"></i>Distribution</h3>
-                            <div class="row g-3">
-                                <c:forEach var="acteur" items="${film.acteurs}">
-                                    <div class="col-md-6 col-lg-4">
-                                        <a href="${pageContext.request.contextPath}/acteurs/${acteur.idActeur}" 
-                                           class="text-decoration-none">
-                                            <div class="acteur-card">
-                                                <c:choose>
-                                                    <c:when test="${not empty acteur.photo}">
-                                                        <img src="${pageContext.request.contextPath}${acteur.photo}" 
-                                                             alt="Acteur profil" class="acteur-photo"
-                                                             onerror="this.onerror=null; this.src='${pageContext.request.contextPath}/images/Profil.webp';">
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <img src="${pageContext.request.contextPath}/images/Profil.webp" 
-                                                             alt="Acteur profil" class="acteur-photo">
-                                                    </c:otherwise>
-                                                </c:choose>
-                                                <h6 class="mb-0">${acteur.nom} ${acteur.prenom}</h6>
-                                                <c:if test="${not empty acteur.pays}">
-                                                    <small class="text-muted">${acteur.pays.nom}</small>
-                                                </c:if>
-                                            </div>
-                                        </a>
-                                    </div>
-                                </c:forEach>
-                            </div>
-                        </div>
-                    </c:if>
+                     <!-- A venir -->
                 </div>
                 
                 <!-- Colonne infos -->
@@ -307,9 +277,7 @@
                         </div>
                         <div class="info-value">
                             G
-                            <c:if test="${not empty film.classification.signification}">
-                                <br><small class="text-muted">Tous publics - General Audiences</small>
-                            </c:if>
+                            <br><small class="text-muted">Tous publics - General Audiences</small>
                         </div>
                     
                         <div class="info-label">

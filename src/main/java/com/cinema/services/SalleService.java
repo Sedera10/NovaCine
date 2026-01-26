@@ -1,21 +1,29 @@
 package com.cinema.services;
 
 import com.cinema.models.Salle;
-import com.cinema.models.Seance;
+import com.cinema.models.TypePersonne;
+import com.cinema.dto.SiegeDTO;
 import com.cinema.models.ConfigSalles;
 import com.cinema.models.TypePlace;
 import com.cinema.repositories.SalleRepository;
+import com.cinema.repositories.TypePersonneRepository;
 import com.cinema.repositories.ConfigSallesRepository;
+import com.cinema.repositories.TypePlaceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class SalleService {
-    
+
     @Autowired
     private SalleRepository salleRepository;
     
@@ -23,132 +31,150 @@ public class SalleService {
     private ConfigSallesRepository configSallesRepository;
     
     @Autowired
-    private TypePlaceService typePlaceService;
-    
+    private TypePlaceRepository typePlaceRepository;
+
     @Autowired
-    private PlaceService placeService;
+    private TypePersonneRepository typePersonneRepository;
     
     public List<Salle> getAllSalles() {
         return salleRepository.findAll();
     }
     
-    public Salle getSalleById(Long id) {
-        return salleRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Salle non trouvée avec l'ID: " + id));
+    public List<Salle> rechercherSalles(String search) {
+        return salleRepository.findByNomContainingIgnoreCase(search);
     }
     
-    public List<Salle> getSallesOrderByNom() {
-        return salleRepository.findAllOrderByNom();
+    public Optional<Salle> getSalleById(Long id) {
+        return salleRepository.findById(id);
     }
     
-    public Salle getSalleByNom(String nom) {
-        return salleRepository.findByNom(nom)
-                .orElseThrow(() -> new RuntimeException("Salle non trouvée avec le nom: " + nom));
+    public List<TypePlace> getAllTypesPlaces() {
+        return typePlaceRepository.findAll();
     }
     
-    @Transactional
-    public Salle saveSalle(Salle salle) {
-        return salleRepository.save(salle);
-    }
-    
-    /**
-     * Ajoute une salle avec configuration des types de places
-     * @param nom Nom de la salle
-     * @param capacite Capacité totale
-     * @param nbRangee Nombre de rangées
-     * @param nbColonne Nombre de colonnes
-     * @param configurationsPlaces Map contenant idTypePlace -> nombrePlaces
-     * @return La salle créée
-     */
-    @Transactional
-    public Salle addSalle(String nom, Integer capacite, Integer nbRangee, Integer nbColonne, 
-                          Map<Long, Integer> configurationsPlaces) {
-        // Validation: nbRangee * nbColonne = capacite
-        if (nbRangee * nbColonne != capacite) {
-            throw new RuntimeException("La capacité doit être égale à nbRangee * nbColonne");
-        }
-        
-        // Validation: la somme des configurations doit égaler la capacité
-        int sommePlaces = configurationsPlaces.values().stream()
-                .mapToInt(Integer::intValue)
-                .sum();
-        
-        if (sommePlaces != capacite) {
-            throw new RuntimeException(
-                String.format("La somme des places par type (%d) doit égaler la capacité totale (%d)", 
-                              sommePlaces, capacite)
-            );
-        }
-        
-        // Créer la salle
-        Salle salle = new Salle(nom, capacite, nbRangee, nbColonne);
-        Salle savedSalle = salleRepository.save(salle);
-        
-        // Créer les configurations
-        for (Map.Entry<Long, Integer> entry : configurationsPlaces.entrySet()) {
-            TypePlace typePlace = typePlaceService.getTypePlaceById(entry.getKey());
-            ConfigSalles config = new ConfigSalles(savedSalle, typePlace, entry.getValue());
-            configSallesRepository.save(config);
-        }
-        
-        // Générer automatiquement les places
-        placeService.genererPlacesPourSalle(savedSalle);
-        
-        return savedSalle;
-    }
-    
-    /**
-     * Version simplifiée sans configuration (pour compatibilité)
-     */
-    @Transactional
-    public Salle addSalle(String nom, Integer capacite, Integer nbRangee, Integer nbColonne) {
-        if (nbRangee * nbColonne != capacite) {
-            throw new RuntimeException("La capacité doit être égale à nbRangee * nbColonne");
-        }
-        
-        Salle salle = new Salle(nom, capacite, nbRangee, nbColonne);
-        Salle savedSalle = salleRepository.save(salle);
-        
-        // Générer automatiquement les places
-        placeService.genererPlacesPourSalle(savedSalle);
-        
-        return savedSalle;
-    }
-    
-    @Transactional
-    public Salle updateSalle(Long id, Salle salleData) {
-        Salle salle = getSalleById(id);
-        salle.setNom(salleData.getNom());
-        salle.setCapacite(salleData.getCapacite());
-        salle.setNbRangee(salleData.getNbRangee());
-        salle.setNbColonne(salleData.getNbColonne());
-        return salleRepository.save(salle);
-    }
-    
-    @Transactional
-    public void deleteSalle(Long id) {
-        salleRepository.deleteById(id);
-    }
-    
-    /**
-     * Récupère les configurations d'une salle
-     */
-    public List<ConfigSalles> getConfigurationsSalle(Long idSalle) {
-        Salle salle = getSalleById(idSalle);
+    public List<ConfigSalles> getConfigurationsBySalle(Salle salle) {
         return configSallesRepository.findBySalle(salle);
     }
-
-    public double getArgentGenere(Long id) {
-        Salle salle = salleRepository.findById(id).orElseThrow(() -> new RuntimeException("Salle not found"));
-       
-        List<ConfigSalles> configs = configSallesRepository.findBySalle(salle);
-        double totalArgent = 0.0;
-
-        for (ConfigSalles c: configs) {
-            TypePlace tp = c.getTypePlace();
-            totalArgent += tp.getPrix() * c.getNombrePlaces();
+    
+    @Transactional
+    public Salle creerSalleAvecConfig(String nom, Integer capacite, List<Long> idTypePlaces, List<Integer> nombres) {
+        Salle salle = new Salle();
+        salle.setNom(nom);
+        salle.setCapacite(capacite);
+        salle.setDtCreation(LocalDateTime.now());
+        
+        Salle savedSalle = salleRepository.save(salle);
+        
+        if (idTypePlaces != null && nombres != null) {
+            for (int i = 0; i < idTypePlaces.size(); i++) {
+                TypePlace typePlace = typePlaceRepository.findById(idTypePlaces.get(i))
+                    .orElseThrow(() -> new IllegalArgumentException("Type de place non trouvé"));
+                
+                ConfigSalles config = new ConfigSalles();
+                config.setSalle(savedSalle);
+                config.setTypePlace(typePlace);
+                config.setNombre(nombres.get(i));
+                configSallesRepository.save(config);
+            }
         }
-        return totalArgent;
+        
+        return savedSalle;
     }
-}
+    
+    @Transactional
+    public Salle modifierSalle(Long id, String nom, Integer capacite, List<Long> idTypePlaces, List<Integer> nombres) {
+        Optional<Salle> existingSalle = salleRepository.findById(id);
+        if (existingSalle.isEmpty()) {
+            throw new IllegalArgumentException("Salle non trouvée");
+        }
+        
+        Salle salle = existingSalle.get();
+        salle.setNom(nom);
+        salle.setCapacite(capacite);
+        
+        Salle updatedSalle = salleRepository.save(salle);
+        
+        configSallesRepository.deleteBySalleIdSalle(id);
+        
+        if (idTypePlaces != null && nombres != null) {
+            for (int i = 0; i < idTypePlaces.size(); i++) {
+                TypePlace typePlace = typePlaceRepository.findById(idTypePlaces.get(i))
+                    .orElseThrow(() -> new IllegalArgumentException("Type de place non trouvé"));
+                
+                ConfigSalles config = new ConfigSalles();
+                config.setSalle(updatedSalle);
+                config.setTypePlace(typePlace);
+                config.setNombre(nombres.get(i));
+                configSallesRepository.save(config);
+            }
+        }
+        
+        return updatedSalle;
+    }
+    
+    @Transactional
+    public void supprimerSalle(Long id) {
+        configSallesRepository.deleteBySalleIdSalle(id);
+        salleRepository.deleteById(id);
+    }
 
+    /**
+     * Génère la liste des sièges (non persistés) à partir des configurations (ConfigSalles)
+     * La distribution est effectuée séquentiellement en respectant les nombres par type.
+     */
+    public List<SiegeDTO> genererSiegesDepuisConfig(Salle salle) {
+        List<SiegeDTO> sieges = new ArrayList<>();
+        List<ConfigSalles> configs = getConfigurationsBySalle(salle);
+        if (configs == null || configs.isEmpty()) return sieges;
+
+        int total = configs.stream().mapToInt(ConfigSalles::getNombre).sum();
+        if (total <= 0) return sieges;
+
+        // Déterminer colonnes/ rangées (max 26 rangées A-Z)
+        int colonnes = (int) Math.ceil(Math.sqrt(total));
+        int rangees = (int) Math.ceil((double) total / colonnes);
+        while (rangees > 26) {
+            colonnes++;
+            rangees = (int) Math.ceil((double) total / colonnes);
+        }
+
+        // Préparer un itérateur sur les types avec compte restant
+        List<Map<String,Object>> pool = new ArrayList<>();
+        for (ConfigSalles c : configs) {
+            Map<String,Object> m = new HashMap<>();
+            m.put("type", c.getTypePlace());
+            m.put("remaining", c.getNombre());
+            pool.add(m);
+        }
+
+        int seatIndex = 0;
+        for (int r = 0; r < rangees; r++) {
+            char rangeeChar = (char) ('A' + r);
+            for (int c = 1; c <= colonnes; c++) {
+                if (seatIndex >= total) break;
+
+                // obtenir type courant
+                TypePlace selectedType = null;
+                for (Map<String,Object> entry : pool) {
+                    int rem = (int) entry.get("remaining");
+                    if (rem > 0) {
+                        selectedType = (TypePlace) entry.get("type");
+                        entry.put("remaining", rem - 1);
+                        break;
+                    }
+                }
+
+                if (selectedType == null) selectedType = configs.get(0).getTypePlace();
+
+                String pos = String.valueOf(rangeeChar) + c;
+                SiegeDTO s = new SiegeDTO(null, String.valueOf(rangeeChar), c, pos, "DISPONIBLE", selectedType);
+                sieges.add(s);
+                seatIndex++;
+            }
+            if (seatIndex >= total) break;
+        }
+
+        return sieges;
+    }
+
+}

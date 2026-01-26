@@ -246,11 +246,11 @@
                         <h1 class="mb-2"><i class="bi bi-calendar-event me-2"></i>Séances de Cinéma</h1>
                         <p class="mb-0 opacity-75">Programmation et réservations</p>
                     </div>
-                    <c:if test="${userDetail.admin or userDetail.manager}">
-                        <a href="${pageContext.request.contextPath}/seances/nouveau" class="btn btn-secondary-custom btn-lg">
-                            <i class="bi bi-plus-circle me-2"></i>Nouvelle Séance
-                        </a>
-                    </c:if>
+                   
+                    <a href="${pageContext.request.contextPath}/seances/nouveau" class="btn btn-secondary-custom btn-lg">
+                        <i class="bi bi-plus-circle me-2"></i>Nouvelle Séance
+                    </a>
+                  
                 </div>
             </div>
             
@@ -422,7 +422,6 @@
                                             </a>
                                         </c:if>
                                         
-                                        <c:if test="${userDetail.admin or userDetail.manager}">
                                             <a href="${pageContext.request.contextPath}/seances/${seance.idSeance}/modifier" 
                                                class="btn btn-sm btn-outline-secondary">
                                                 <i class="bi bi-pencil me-1"></i>Modifier
@@ -437,7 +436,7 @@
                                                     </button>
                                                 </form>
                                             </c:if>
-                                        </c:if>
+                                        
                                     </div>
                                 </div>
                             </div>

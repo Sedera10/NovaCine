@@ -284,6 +284,134 @@
             border: 1px solid #dee2e6;
             border-radius: 4px;
         }
+        
+        .date-filters {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .date-filter-btn {
+            padding: 10px 24px;
+            background: white;
+            color: var(--primary-color);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .date-filter-btn:hover {
+            border: 2px solid var(--primary-color);
+            border-radius: 4px;
+        }
+        
+        .date-filter-btn.active {
+            border: 2px solid var(--primary-color);
+            border-radius: 4px;
+        }
+        
+        .seances-grid {
+            display: grid;
+            width: 500px;
+            gap: 1.0rem;
+            margin-top: 1.5rem;
+        }
+        
+        .seance-card {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: row;
+            height: 240px; /* Hauteur du card - augmenter/diminuer ici */
+        }
+        
+        .seance-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .seance-poster {
+            width: 145px;  /* Largeur de l'image - augmenter/diminuer ici */
+            height: 190px; /* Hauteur de l'image (même que card) */
+            object-fit: cover;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            flex-shrink: 0;
+        }
+        
+        .seance-content {
+            padding: 1rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .seance-titre {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.6rem;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .seance-infos {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            margin-bottom: 0.8rem;
+        }
+        
+        .seance-info-item {
+            display: flex;
+            align-items: center;
+            color: #495057;
+            font-size: 0.85rem;
+        }
+        
+        .seance-info-item i {
+            color: var(--primary-color);
+            margin-right: 0.5rem;
+            font-size: 0.9rem;
+            width: 16px;
+        }
+        
+        .seance-actions {
+            display: flex;
+            flex-direction: row;
+            gap: 0.3rem;
+            margin-top: auto;
+        }
+        
+        .btn-action {
+            padding: 0.4rem 0.6rem;
+            border-radius: 4px;
+            font-weight: 600;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.3rem;
+            transition: all 0.3s;
+            border: none;
+            font-size: 0.9rem;
+            flex: 1;
+        }
+        
+        .btn-action i {
+            font-size: 0.6rem;
+        }
     </style>
 </head>
 <body>
@@ -298,18 +426,19 @@
                         <h1 class="mb-2"><i class="bi bi-film me-2"></i>Séances de Cinéma</h1>
                         <p class="mb-0 opacity-75">Liste des Séances Completes</p>
                     </div>
-                    <c:if test="${user.role.nomRole eq 'Admin' or user.role.nomRole eq 'Manager'}">
-                        <a href="${pageContext.request.contextPath}/seances/nouveau" class="btn-warning-custom">
-                            <i class="bi bi-plus-circle me-2"></i>Nouveau séance
-                        </a>
-                    </c:if>
+                    <a href="${pageContext.request.contextPath}/seances/nouveau" class="btn-warning-custom">
+                        <i class="bi bi-plus-circle me-2"></i>Nouveau séance
+                    </a>
+                    
                 </div>
                 <!-- <h1><i class="bi bi-calendar-event me-2"></i>Séances de Cinéma</h1> -->
             </div>
         
         <!-- Filtres -->
         <div class="filter-card">
-            <form method="get" action="<c:url value='/seances'/>" class="row g-3">
+            <form method="get" action="<c:url value='/seances'/>" class="row g-3" id="filterForm">
+                <input type="hidden" name="periode" id="periodeInput" value="${periodeActive}">
+                
                 <div class="col-md-4">
                     <label class="form-label">Film:</label>
                     <select name="filmId" class="form-select">
@@ -335,7 +464,7 @@
                 </div>
                 
                 <div class="col-md-3">
-                    <label class="form-label">Date:</label>
+                    <label class="form-label">Date spécifique:</label>
                     <input type="date" name="date" value="${date}" class="form-control">
                 </div>
                 
@@ -348,6 +477,30 @@
                     </a>
                 </div>
             </form>
+            
+            <!-- Filtres de date rapides -->
+            <div class="date-filters">
+                <a href="?periode=aujourd_hui<c:if test='${not empty filmId}'>&filmId=${filmId}</c:if><c:if test='${not empty salleId}'>&salleId=${salleId}</c:if>" 
+                   class="date-filter-btn ${periodeActive == 'aujourd_hui' ? 'active' : ''}">
+                    <i class="bi bi-calendar-day me-1"></i>Aujourd'hui
+                </a>
+                <a href="?periode=demain<c:if test='${not empty filmId}'>&filmId=${filmId}</c:if><c:if test='${not empty salleId}'>&salleId=${salleId}</c:if>" 
+                   class="date-filter-btn ${periodeActive == 'demain' ? 'active' : ''}">
+                    <i class="bi bi-calendar-plus me-1"></i>Demain
+                </a>
+                <a href="?periode=semaine<c:if test='${not empty filmId}'>&filmId=${filmId}</c:if><c:if test='${not empty salleId}'>&salleId=${salleId}</c:if>" 
+                   class="date-filter-btn ${periodeActive == 'semaine' ? 'active' : ''}">
+                    <i class="bi bi-calendar-week me-1"></i>Cette semaine
+                </a>
+                <a href="?periode=semaine_prochaine<c:if test='${not empty filmId}'>&filmId=${filmId}</c:if><c:if test='${not empty salleId}'>&salleId=${salleId}</c:if>" 
+                   class="date-filter-btn ${periodeActive == 'semaine_prochaine' ? 'active' : ''}">
+                    <i class="bi bi-calendar-range me-1"></i>Semaine prochaine
+                </a>
+                <a href="?periode=tous<c:if test='${not empty filmId}'>&filmId=${filmId}</c:if><c:if test='${not empty salleId}'>&salleId=${salleId}</c:if>" 
+                   class="date-filter-btn ${periodeActive == 'tous' ? 'active' : ''}">
+                    <i class="bi bi-calendar3 me-1"></i>Tous
+                </a>
+            </div>
         </div>
         
         <!-- Messages -->
@@ -358,62 +511,58 @@
             <div class="alert alert-danger">${error}</div>
         </c:if>
         
-        <!-- Liste des séances -->
-        <c:forEach items="${seances}" var="seance">
-            <div class="seance-card">
-                <!-- Poster à gauche -->
-                <img src="<c:url value='/images/films/${seance.film.posterPath}'/>" 
-                     alt="${seance.film.titre}" 
-                     class="seance-poster"
-                     onerror="this.style.background='linear-gradient(135deg, #667eea 0%, #764ba2 100%)'; this.style.display='flex'; this.style.alignItems='center'; this.style.justifyContent='center'; this.innerHTML='<i class=&quot;bi bi-film&quot; style=&quot;font-size: 3rem; color: white;&quot;></i>'">
-                
-                <!-- Contenu à droite -->
-                <div class="seance-content">
-                    <!-- Titre -->
-                    <div class="seance-titre">${seance.film.titre}</div>
+        <!-- Grille des séances -->
+        <div class="seances-grid">
+            <c:forEach items="${seances}" var="seance">
+                <div class="seance-card">
+                    <!-- Poster en haut -->
+                    <img src="<c:url value='/images/films/${seance.film.poster}'/>" 
+                         alt="${seance.film.titre}" 
+                         class="seance-poster"
+                         onerror="this.style.background='linear-gradient(135deg, #667eea 0%, #764ba2 100%)'; this.style.display='flex'; this.style.alignItems='center'; this.style.justifyContent='center'; this.innerHTML='<i class=&quot;bi bi-film&quot; style=&quot;font-size: 3rem; color: white;&quot;></i>'">
                     
-                    <!-- Infos en ligne -->
-                    <div class="seance-infos">
-                        <div class="seance-info-item">
-                            <i class="bi bi-calendar-event"></i>
-                            <strong>Date:</strong> ${seance.daty}
+                    <!-- Contenu -->
+                    <div class="seance-content">
+                        <!-- Titre -->
+                        <div class="seance-titre">${seance.film.titre}</div>
+                        
+                        <!-- Infos -->
+                        <div class="seance-infos">
+                            <div class="seance-info-item">
+                                <i class="bi bi-calendar-event"></i>
+                                <fmt:parseDate value="${seance.dateSeance}" pattern="yyyy-MM-dd" var="parsedDate" type="date"/>
+                                <fmt:formatDate value="${parsedDate}" pattern="dd/MM/yyyy"/>
+                            </div>
+                            <div class="seance-info-item">
+                                <i class="bi bi-clock"></i>
+                                ${seance.heureSeance}
+                            </div>
+                            <div class="seance-info-item">
+                                <i class="bi bi-door-open"></i>
+                                ${seance.salle.nom}
+                            </div>
                         </div>
-                        <div class="seance-info-item">
-                            <i class="bi bi-clock"></i>
-                            <strong>Heure:</strong> ${seance.heure}
+                        
+                        <!-- Boutons d'action -->
+                        <div class="seance-actions">
+                            <a href="<c:url value='/seances/${seance.idSeance}'/>" class="btn-action btn-primary-custom">
+                                <i class="bi bi-eye"></i> Détails
+                            </a>
+                            <a href="<c:url value='/achats/seance/${seance.idSeance}'/>" class="btn-action btn-success-custom">
+                                <i class="bi bi-ticket-perforated"></i> Acheter
+                            </a>
+                            <a href="<c:url value='/seances/${seance.idSeance}/ventes'/>" class="btn-action btn-warning-custom">
+                                <i class="bi bi-cash-stack"></i> Ventes
+                            </a>
                         </div>
-                        <div class="seance-info-item">
-                            <i class="bi bi-door-open"></i>
-                            <strong>Salle:</strong> ${seance.salle.nom}
-                        </div>
-                        <div class="seance-info-item">
-                            <i class="bi bi-cash-coin"></i>
-                            <strong>Potentiel:</strong> 
-                            <span class="text-success fw-bold">
-                                <fmt:formatNumber value="${totauxArgent[seance.idSeance]}" type="number" groupingUsed="true" /> Ar
-                            </span>
-                        </div>
-                    </div>
-                    
-                    <!-- Boutons alignés à droite en bas -->
-                    <div class="seance-actions">
-                        <a href="<c:url value='/seances/${seance.idSeance}'/>" class="btn-primary-custom">
-                            <i class="bi bi-eye"></i> Détails
-                        </a>
-                        <a href="<c:url value='/achats/seance/${seance.idSeance}'/>" class="btn-success-custom">
-                            <i class="bi bi-ticket-perforated"></i> Acheter Billet
-                        </a>
-                        <a href="<c:url value='/achats/seance/${seance.idSeance}/ventes'/>" class="btn-warning-custom">
-                            <i class="bi bi-cash-stack"></i> Ventes
-                        </a>
                     </div>
                 </div>
-            </div>
-        </c:forEach>
+            </c:forEach>
+        </div>
         
         <c:if test="${empty seances}">
-            <div class="alert alert-info">
-                <i class="bi bi-info-circle me-2"></i>Aucune séance trouvée.
+            <div class="alert alert-info mt-4">
+                <i class="bi bi-info-circle me-2"></i>Aucune séance trouvée pour cette période.
             </div>
         </c:if>
         </div>
