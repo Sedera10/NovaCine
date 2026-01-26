@@ -12,6 +12,7 @@ import java.util.List;
 @Repository
 public interface ConfigSallesRepository extends JpaRepository<ConfigSalles, Long> {
     List<ConfigSalles> findBySalle(Salle salle);
+    List<ConfigSalles> findBySalleIdSalle(Long idSalle);
     
     @Modifying
     @Query("DELETE FROM ConfigSalles c WHERE c.salle.idSalle = ?1")
